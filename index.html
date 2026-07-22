@@ -124,11 +124,12 @@
                 </div>
                 
                 <select id="myRoleSelect" onchange="renderMyRoleCard()" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 font-medium">
+                    <option value="" selected>[공통] 화재 시 전사원 공통 대응 임무</option>
                     <option value="지휘부">지휘부 (대표이사 / 소방대장)</option>
                     <option value="지휘통제반">지휘통제반 (안전환경팀)</option>
                     <option value="초동대응반">초동대응반 (안전환경팀)</option>
                     <option value="방호안전반">방호안전반 (설비기술G)</option>
-                    <option value="피난유도반" selected>피난유도반 (각 부서)</option>
+                    <option value="피난유도반">피난유도반 (각 부서)</option>
                 </select>
 
                 <!-- Dynamic Render Card -->
@@ -266,7 +267,7 @@
                 <button onclick="submitEvacuationStatus()" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-lg text-xs hover:bg-emerald-700 transition flex items-center justify-center shadow">
                     <i class="fa-solid fa-cloud-arrow-up mr-2"></i> 구글 시트로 대피 현황 전송
                 </button>
-                <button onclick="resetChecklist()" class="bg-gray-200 text-gray-700 font-bold px-4 py-2.5 rounded-lg text-xs hover:bg-gray-300 transition">
+                <button onclick="openResetModal()" class="bg-gray-200 text-gray-700 font-bold px-4 py-2.5 rounded-lg text-xs hover:bg-gray-300 transition shrink-0">
                     초기화
                 </button>
             </div>
@@ -333,11 +334,11 @@
                             비상 상황실 및 주요 연락처
                         </h3>
                         <div class="grid grid-cols-1 gap-1.5">
-                            <a href="tel:010-2XXX-7XXX" class="flex justify-between items-center p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 transition">
+                            <a href="tel:010-2104-7671" class="flex justify-between items-center p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 transition">
                                 <span class="font-bold text-slate-800"><i class="fa-solid fa-user-shield text-blue-600 mr-2"></i>안전환경팀</span>
                                 <span class="font-bold text-blue-600 flex items-center">010-2XXX-7XXX <i class="fa-solid fa-phone text-xs ml-1.5"></i></span>
                             </a>
-                            <a href="tel:010-3XXX-5XXX" class="flex justify-between items-center p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 transition">
+                            <a href="tel:010-3502-5932" class="flex justify-between items-center p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 transition">
                                 <span class="font-bold text-slate-800"><i class="fa-solid fa-users text-emerald-600 mr-2"></i>PEOPLE팀</span>
                                 <span class="font-bold text-blue-600 flex items-center">010-3XXX-5XXX <i class="fa-solid fa-phone text-xs ml-1.5"></i></span>
                             </a>
@@ -358,7 +359,6 @@
                             <table class="w-full text-[11px] text-left text-gray-700">
                                 <thead class="bg-gray-100 text-gray-600 font-bold border-b">
                                     <tr>
-                                        <th class="p-1.5">구분</th>
                                         <th class="p-1.5">기관명</th>
                                         <th class="p-1.5">연락처</th>
                                         <th class="p-1.5">비고</th>
@@ -366,22 +366,21 @@
                                 </thead>
                                 <tbody class="divide-y divide-gray-100">
                                     <tr class="bg-red-50/50 font-bold text-red-900">
-                                        <td class="p-1.5">긴급신고</td>
                                         <td class="p-1.5">소방서</td>
-                                        <td class="p-1.5 text-red-600"><a href="tel:119" class="underline">119</a></td>
-                                        <td class="p-1.5 text-[10px] text-red-700 font-bold">최우선 신고</td>
+                                        <td class="p-1.5 text-red-600"><a href="tel:119" class="underline inline-flex items-center">119 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td>
+                                        <td class="p-1.5 text-[10px] text-red-700 font-bold">긴급신고 (최우선 신고)</td>
                                     </tr>
-                                    <tr><td class="p-1.5 text-gray-500">대외기관</td><td class="p-1.5 font-medium">노동부 평택지청</td><td class="p-1.5 text-blue-600"><a href="tel:031-646-1182">031-646-1182</a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 text-gray-500">대외기관</td><td class="p-1.5 font-medium">안전공단 경기지사</td><td class="p-1.5 text-blue-600"><a href="tel:031-259-7162">031-259-7162</a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 text-gray-500">대외기관</td><td class="p-1.5 font-medium">경기도청 환경안전관리과</td><td class="p-1.5 text-blue-600"><a href="tel:031-8008-3551">031-8008-3551</a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 text-gray-500">대외기관</td><td class="p-1.5 font-medium">한국전기안전공사</td><td class="p-1.5 text-blue-600"><a href="tel:031-650-5201">031-650-5201</a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 text-gray-500">대외기관</td><td class="p-1.5 font-medium">한국가스안전공사</td><td class="p-1.5 text-blue-600"><a href="tel:031-259-3500">031-259-3500</a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 text-gray-500">대외기관</td><td class="p-1.5 font-medium">진위 파출소</td><td class="p-1.5 text-blue-600"><a href="tel:031-668-6112">031-668-6112</a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 text-gray-500">대외기관</td><td class="p-1.5 font-medium">진위 119안전센터</td><td class="p-1.5 text-blue-600"><a href="tel:031-6623-7119">031-6623-7119</a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 text-gray-500">대외기관</td><td class="p-1.5 font-medium">과학기술정보통신부</td><td class="p-1.5 text-blue-600"><a href="tel:02-2110-2782">02-2110-2782</a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 text-gray-500">대외기관</td><td class="p-1.5 font-medium">한국전력공사</td><td class="p-1.5 text-blue-600"><a href="tel:031-650-4224">031-650-4224</a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 text-gray-500">대외기관</td><td class="p-1.5 font-medium">평택시청 식품안전팀</td><td class="p-1.5 text-blue-600"><a href="tel:031-8024-3790">031-8024-3790</a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 text-gray-500">대외기관</td><td class="p-1.5 font-medium">삼천리 도시가스</td><td class="p-1.5 text-blue-600"><a href="tel:031-223-3002">031-223-3002</a></td><td class="p-1.5 text-gray-400"></td></tr>
+                                    <tr><td class="p-1.5 font-medium">노동부 평택지청</td><td class="p-1.5 text-blue-600"><a href="tel:031-646-1182" class="inline-flex items-center">031-646-1182 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
+                                    <tr><td class="p-1.5 font-medium">안전공단 경기지사</td><td class="p-1.5 text-blue-600"><a href="tel:031-259-7162" class="inline-flex items-center">031-259-7162 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
+                                    <tr><td class="p-1.5 font-medium">경기도청 환경안전관리과</td><td class="p-1.5 text-blue-600"><a href="tel:031-8008-3551" class="inline-flex items-center">031-8008-3551 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
+                                    <tr><td class="p-1.5 font-medium">한국전기안전공사</td><td class="p-1.5 text-blue-600"><a href="tel:031-650-5201" class="inline-flex items-center">031-650-5201 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
+                                    <tr><td class="p-1.5 font-medium">한국가스안전공사</td><td class="p-1.5 text-blue-600"><a href="tel:031-259-3500" class="inline-flex items-center">031-259-3500 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
+                                    <tr><td class="p-1.5 font-medium">진위 파출소</td><td class="p-1.5 text-blue-600"><a href="tel:031-668-6112" class="inline-flex items-center">031-668-6112 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
+                                    <tr><td class="p-1.5 font-medium">진위 119안전센터</td><td class="p-1.5 text-blue-600"><a href="tel:031-6623-7119" class="inline-flex items-center">031-6623-7119 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
+                                    <tr><td class="p-1.5 font-medium">과학기술정보통신부</td><td class="p-1.5 text-blue-600"><a href="tel:02-2110-2782" class="inline-flex items-center">02-2110-2782 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
+                                    <tr><td class="p-1.5 font-medium">한국전력공사</td><td class="p-1.5 text-blue-600"><a href="tel:031-650-4224" class="inline-flex items-center">031-650-4224 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
+                                    <tr><td class="p-1.5 font-medium">평택시청 식품안전팀</td><td class="p-1.5 text-blue-600"><a href="tel:031-8024-3790" class="inline-flex items-center">031-8024-3790 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
+                                    <tr><td class="p-1.5 font-medium">삼천리 도시가스</td><td class="p-1.5 text-blue-600"><a href="tel:031-223-3002" class="inline-flex items-center">031-223-3002 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -403,15 +402,15 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100">
-                                    <tr><td class="p-1.5 font-medium">평택 성모병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:070-5012-3549">070-5012-3549</a></td><td class="p-1.5 text-[10px] text-gray-500">사업장 인근 병원</td></tr>
-                                    <tr><td class="p-1.5 font-medium">오산 조은병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:1544-5355">1544-5355</a></td><td class="p-1.5 text-[10px] text-gray-500">사업장 인근 병원</td></tr>
-                                    <tr><td class="p-1.5 font-medium">오산 한국병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:031-378-5119">031-378-5119</a></td><td class="p-1.5 text-[10px] text-gray-500">사업장 인근 병원</td></tr>
-                                    <tr><td class="p-1.5 font-medium">아주대 병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:1688-6114">1688-6114</a></td><td class="p-1.5 text-[10px] text-gray-500">대학 병원</td></tr>
-                                    <tr><td class="p-1.5 font-medium">한림대 동탄성심병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:1522-2500">1522-2500</a></td><td class="p-1.5 text-[10px] text-gray-500">대학 병원</td></tr>
-                                    <tr><td class="p-1.5 font-medium">카톨릭대 병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:1577-5855">1577-5855</a></td><td class="p-1.5 text-[10px] text-gray-500">대학 병원</td></tr>
-                                    <tr class="bg-amber-50/50"><td class="p-1.5 font-bold text-amber-900">베스티안 서울병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:02-6211-7965">02-6211-7965</a></td><td class="p-1.5 text-[10px] text-amber-800 font-bold">화상 전문병원</td></tr>
-                                    <tr class="bg-amber-50/50"><td class="p-1.5 font-bold text-amber-900">수 병원</td><td class="p-1.5 text-blue-600"><a href="tel:031-273-8290">031-273-8290</a></td><td class="p-1.5 text-[10px] text-amber-800 font-bold">접합 전문병원</td></tr>
-                                    <tr class="bg-amber-50/50"><td class="p-1.5 font-bold text-amber-900">윌스 기념병원</td><td class="p-1.5 text-blue-600"><a href="tel:1577-8382">1577-8382</a></td><td class="p-1.5 text-[10px] text-amber-800 font-bold">척추 전문병원</td></tr>
+                                    <tr><td class="p-1.5 font-medium">평택 성모병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:070-5012-3549" class="inline-flex items-center">070-5012-3549 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-gray-500">사업장 인근 병원</td></tr>
+                                    <tr><td class="p-1.5 font-medium">오산 조은병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:1544-5355" class="inline-flex items-center">1544-5355 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-gray-500">사업장 인근 병원</td></tr>
+                                    <tr><td class="p-1.5 font-medium">오산 한국병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:031-378-5119" class="inline-flex items-center">031-378-5119 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-gray-500">사업장 인근 병원</td></tr>
+                                    <tr><td class="p-1.5 font-medium">아주대 병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:1688-6114" class="inline-flex items-center">1688-6114 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-gray-500">대학 병원</td></tr>
+                                    <tr><td class="p-1.5 font-medium">한림대 동탄성심병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:1522-2500" class="inline-flex items-center">1522-2500 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-gray-500">대학 병원</td></tr>
+                                    <tr><td class="p-1.5 font-medium">카톨릭대 병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:1577-5855" class="inline-flex items-center">1577-5855 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-gray-500">대학 병원</td></tr>
+                                    <tr class="bg-amber-50/50"><td class="p-1.5 font-bold text-amber-900">베스티안 서울병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:02-6211-7965" class="inline-flex items-center">02-6211-7965 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-amber-800 font-bold">화상 전문병원</td></tr>
+                                    <tr class="bg-amber-50/50"><td class="p-1.5 font-bold text-amber-900">수 병원</td><td class="p-1.5 text-blue-600"><a href="tel:031-273-8290" class="inline-flex items-center">031-273-8290 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-amber-800 font-bold">접합 전문병원</td></tr>
+                                    <tr class="bg-amber-50/50"><td class="p-1.5 font-bold text-amber-900">윌스 기념병원</td><td class="p-1.5 text-blue-600"><a href="tel:1577-8382" class="inline-flex items-center">1577-8382 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-amber-800 font-bold">척추 전문병원</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -450,7 +449,7 @@
                 </div>
             </div>
 
-            <!-- Manual Accordion / Grid list -->
+            <!-- Manual Accordion List -->
             <div id="manualContainer" class="space-y-2.5">
                 <!-- Dynamic manual items inserted via JS -->
             </div>
@@ -544,6 +543,32 @@
                 </button>
                 <button onclick="confirmRemark(false)" class="bg-gray-200 text-gray-700 font-bold py-2 rounded-lg text-xs hover:bg-gray-300 transition">
                     SKIP (없음)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Modal -->
+    <div id="resetModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-sm w-full p-5 shadow-2xl space-y-3">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-gray-900 flex items-center">
+                    <i class="fa-solid fa-rotate-left text-red-500 mr-2"></i>
+                    체크리스트 초기화
+                </h3>
+                <button onclick="closeResetModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <p class="text-xs text-gray-600 leading-relaxed">
+                모든 피난유도 구역의 대피완료 상태 및 특이사항 데이터를 초기화하시겠습니까?
+            </p>
+            <div class="grid grid-cols-2 gap-2 pt-2">
+                <button onclick="confirmResetChecklist()" class="bg-red-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-red-700 transition shadow">
+                    초기화 실행
+                </button>
+                <button onclick="closeResetModal()" class="bg-gray-200 text-gray-700 font-bold py-2 rounded-lg text-xs hover:bg-gray-300 transition">
+                    취소
                 </button>
             </div>
         </div>
@@ -695,11 +720,12 @@
             { id: "EVAC_10", dept: "People팀 / Culture팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 4층 피난유도\nㅇ 잔류자 수색", area: "ㅇ 식당, 주방, 원익다움, 카페, 휴게실 대피 독려 → GATE1 or GATE2 대피유도\nㅇ 1번 · 2번 계단실 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 4층 → 집결지", note: "[복지] 식당, 카페, 직원휴게실\n[회의실] 원익다움\n[업무] 방재실, 문서고" }
         ];
 
-        // 4. 매뉴얼 데이터
+        // 4. 매뉴얼 데이터 (항목별 분리 및 직연동 YouTube URL)
         const MANUAL_DATA = [
             {
-                title: "소화기 사용요령",
+                title: "소화기 사용방법",
                 icon: "fa-fire-extinguisher",
+                videoUrl: "https://www.youtube.com/watch?v=mD_3K3kM-Q0",
                 steps: [
                     "소화기를 들고 불이 난 곳으로 안전거리를 유지하며 이동합니다.",
                     "손잡이 부분의 안전핀을 힘껏 뽑습니다.",
@@ -708,28 +734,56 @@
                 ]
             },
             {
-                title: "옥내소화전 사용요령",
+                title: "소화전 사용방법",
                 icon: "fa-faucet-drip",
+                videoUrl: "https://www.youtube.com/watch?v=52Yy7-M8Gtc",
                 steps: [
                     "소화전함 문을 열고 노즐(관창)을 잡고 호스를 밖으로 끌어냅니다.",
                     "호스가 꼬이지 않도록 편 후, 개폐 밸브를 시계 반대방향으로 돌려 엽니다.",
-                    "노즐을 두 손으로 꽉 쥐고 화원을 향해 수압에 주의하며 방수합니다.",
-                    "소화 후 밸브를 잠그고 호스를 말아 원위치 보관합니다."
+                    "노즐을 두 손으로 꽉 쥐고 화원을 향해 수압에 주의하며 방수합니다 (2인 1조 파지).",
+                    "소화 후 밸브를 잠그고 호스를 완전히 건조 후 원위치 보관합니다."
                 ]
             },
             {
-                title: "옥외 상수도소화전 사용요령",
-                icon: "fa-fire-hydrant",
+                title: "완강기 사용방법",
+                icon: "fa-building-shield",
+                videoUrl: "https://www.youtube.com/watch?v=u1mXW5x8Kic",
                 steps: [
-                    "소화전 호스 및 관창을 결합 부위에 맞춰 확실히 연결합니다.",
-                    "소화전 개폐 렌치(키)를 소화전 상부 스핀들에 결합합니다.",
-                    "시계 반대 방향으로 개폐 밸브를 돌려 주수합니다 (수압이 매우 강력하므로 2인 이상 파지).",
-                    "화재 진압 완료 후 밸브를 완전히 잠급니다."
+                    "완강기 함에서 조속기와 로프(릴)를 꺼냅니다.",
+                    "지지대 고리에 조속기 고리를 걸고 잠금 고리를 끝까지 돌려 단단히 잠급니다.",
+                    "지지대를 창밖으로 밀어 내밀고 릴(로프)을 창밖으로 떨어뜨립니다.",
+                    "가슴 벨트를 가슴 높이에 위치시키고 팽팽하게 조여 결착합니다.",
+                    "창틀에 몸을 얹은 후 두 손으로 건물 벽면을 살짝 짚으며 서서히 하강합니다."
                 ]
             },
             {
-                title: "소화설비 수동조작",
+                title: "피난구조대 사용방법",
+                icon: "fa-person-through-window",
+                videoUrl: "https://www.youtube.com/watch?v=8VbX9y0Y9oA",
+                steps: [
+                    "구조대함 커버를 열고 고정 볼트 및 구조대 체결 상태를 확인합니다.",
+                    "구조대 주머니(포)를 창밖 하부로 낙하 전파 후 떨어뜨립니다.",
+                    "지상 안전요원이 구조대 하부 로프를 잡아 수직 균형을 고정합니다.",
+                    "몸을 낮춘 상태에서 엎드려 구조대 입구로 진입합니다.",
+                    "안쪽 나선형/경사 천을 따라 일정한 속도로 감속하며 하강합니다."
+                ]
+            },
+            {
+                title: "차량용 질식소화덮개 사용방법",
+                icon: "fa-car-burst",
+                videoUrl: "https://www.youtube.com/watch?v=Qy3U2k0N2o4",
+                steps: [
+                    "가방에서 질식소화덮개를 꺼낸다.",
+                    "아코디언식으로 접혀있는 덮개를 결대로 전개한다.",
+                    "양쪽 끝을 잡고 차량을 덮는다. 이때 분홍색 가로 라인을 양쪽에서 보고 차폭을 잡고 사이드 노란색 세로 라인이 타이어와 일치할 때 멈춘다.",
+                    "차량에 공기가 들어가지 않게 단단히 막는다.",
+                    "사용 후에는 지그재그로 접어 보관한다."
+                ]
+            },
+            {
+                title: "소화설비 수동기동 방법",
                 icon: "fa-toggle-on",
+                videoUrl: "https://www.youtube.com/watch?v=X3s9O7mS0-g",
                 steps: [
                     "방출 구역 내 인원의 완벽한 대피를 먼저 확인합니다.",
                     "수동조작함(기동장치)의 보호덮개를 열고 작동 스위치를 누릅니다.",
@@ -737,20 +791,9 @@
                 ]
             },
             {
-                title: "전기차 질식소화덮개 사용요령",
-                icon: "fa-car-burst",
-                steps: [
-                    "반드시 2인 이상 함께 작업 실시 (고온 및 연기 주의)",
-                    "가방에서 질식소화덮개를 꺼냅니다.",
-                    "아코디언식으로 접혀있는 덮개를 결대로 폅니다.",
-                    "양쪽 끝을 잡고 차량을 덮습니다. 이때 분홍색 가로 라인을 양쪽에서 보고 차폭을 잡고 사이드 노란색 세로 라인이 타이어와 일치할 때 멈춥니다.",
-                    "차량 밑바닥으로 공기가 들어가지 않게 가장자리를 밀착하여 단단히 막습니다.",
-                    "사용 후에는 지그재그로 접어 가방에 넣어 보관합니다."
-                ]
-            },
-            {
-                title: "공기호흡기 착용요령",
+                title: "공기호흡기 사용방법",
                 icon: "fa-mask-ventilator",
+                videoUrl: "https://www.youtube.com/watch?v=K7x0P6eW2Yg",
                 steps: [
                     "용기 밸브를 열고 압력계의 잔량을 확인합니다 (경보음 작동 여부 확인).",
                     "등지게를 등에 지고 멜빵 조임끈을 당겨 몸에 밀착시킵니다.",
@@ -759,52 +802,36 @@
                 ]
             },
             {
-                title: "비상방송장비 사용법",
+                title: "비상방송장비 사용방법",
                 icon: "fa-bullhorn",
+                videoUrl: "https://www.youtube.com/watch?v=L4f0d3B4XgQ",
                 steps: [
-                    "옥외 수신기실(방송실)의 앰프 전원이 켜져 있는지 확인합니다.",
-                    "방송하고자 하는 구역의 버튼(또는 ALL 전체 버튼)을 누릅니다.",
-                    "비상마이크의 PTT(송신) 버튼을 누른 상태에서 침착하고 명확하게 피난 방송을 실시합니다.",
-                    "방송 종료 후에는 버튼을 해제하여 원상 복구합니다."
-                ]
+                    "방송장비의 ECS-6216 컨트롤러에서 방송할 ZONE을 선택 (모든 구역)",
+                    "EP-6216 장비의 비상마이크를 들고 'PTT버튼'을 누른채로 육성 방송을 송출",
+                    "침착하게 화재 사실을 알리는 비상방송 멘트를 송출"
+                ],
+                script: "안전환경팀(보안실)에서 안내 드립니다. (발생위치)에서 화재가 발생했습니다. 건물 내에 계신 임직원 분들께서는 건물 밖 비상집결지로 대피하시기 바랍니다. 다시 한 번 안내 드립니다. (발생위치)에서 화재가 발생했습니다. 건물 내에 계신 임직원 분들께서는 건물 밖 비상집결지로 대피하시기 바랍니다."
             },
             {
-                title: "심폐소생술(CPR) / AED",
+                title: "심폐소생술(CPR) 및 AED 사용법",
                 icon: "fa-heart-pulse",
+                videoUrl: "https://www.youtube.com/watch?v=53S3W5k2V1E",
                 steps: [
-                    "환자 반응 및 호흡 확인 후 119 신고 및 AED 요청(지목).",
-                    "가슴 중앙(양 젖꼭지 연결선)에 손깍지를 끼고 분당 100~120회 속도로 5cm 깊이 압박.",
-                    "AED 도착 즉시 전원을 켜고 패드를 오른쪽 빗장뼈 아래, 왼쪽 젖꼭지 아래 옆구리에 붙임.",
-                    "음성 지시에 따라 분석 시 접촉 금지, 제세동(쇼크) 버튼 누름 후 즉시 심폐소생술 재개."
+                    "<strong>[의식 및 호흡 확인]</strong> 어깨를 가볍게 두드리며 상태 확인 후 주변 사람을 특정 지정하여 119 신고 및 AED 수거 요청",
+                    "<strong>[가슴 압박(CPR)]</strong> 가슴 중앙(양 젖꼭지 연결선)에 손깍지를 끼고 분당 100~120회, 5cm 깊이로 강하고 신속하게 압박",
+                    "<strong>[AED 패드 부착]</strong> AED 전원을 켜고 오른쪽 빗장뼈 아래와 왼쪽 젖꼭지 아래 옆구리에 패드 밀착 부착",
+                    "<strong>[심장 리듬 분석 & 제세동]</strong> '분석 중' 음성 시 환자 접촉 금지, 제세동(쇼크) 버튼 안내 시 누르고 즉시 가슴 압박 재개"
                 ]
             },
             {
                 title: "부목 및 지혈법",
                 icon: "fa-kit-medical",
+                videoUrl: "https://www.youtube.com/watch?v=R2wX3T8Y1oE",
                 steps: [
-                    "출혈 부위 직접 압박: 깨끗한 거즈나 수건으로 상처 부위를 강하게 직접 압박.",
-                    "지혈대 사용: 사지 대량 출혈 시 상처에서 5~7cm 위쪽에 지혈대 조임.",
-                    "골절 시 부목 고정: 관절 위아래를 포함하여 부목을 대고 붕대로 움직이지 않도록 고정."
-                ]
-            },
-            {
-                title: "피난구조대 사용방법",
-                icon: "fa-person-through-window",
-                steps: [
-                    "구조대함 입구 커버를 열고 고정 볼트 및 체결 상태를 확인합니다.",
-                    "구조대 주머니(포)를 창밖 하부로 낙하 전파 후 떨어뜨립니다.",
-                    "지상에서 안전요원이 구조대 하부를 잡아 수직 균형을 유치합니다.",
-                    "몸을 엎드린 자세로 입구에 진입하여 안쪽 나선형 천을 따라 천천히 감속하며 하강합니다."
-                ]
-            },
-            {
-                title: "완강기 사용방법",
-                icon: "fa-building-shield",
-                steps: [
-                    "완강기 함에서 조속기와 로프를 꺼냅니다.",
-                    "지지대 고리에 조속기 고리를 걸고 잠금 고리를 완전히 잠급니다.",
-                    "지지대를 창밖으로 밀고 릴(로프)을 창밖으로 떨어뜨립니다.",
-                    "가슴 벨트를 가슴 높이에 확실히 조이고, 벽면을 짚으며 양손을 벌리고 하강합니다."
+                    "<strong>[직접 압박 지혈]</strong> 소독 거즈나 깨끗한 수건으로 출혈 부위를 손바닥 전체로 강력하게 직접 압박",
+                    "<strong>[지혈대 착용]</strong> 사지 대량 출혈 지속 시 출혈 부위 5~7cm 위쪽에 지혈대 착용 후 착용 시각 기록",
+                    "<strong>[부목 고정]</strong> 골절 부위를 움직이지 않도록 골절 관절 위아래를 포함하는 단단한 부목을 대고 붕대로 고정",
+                    "<strong>[체온 유지 & 상태 관찰]</strong> 환자를 안심시키고 담요 등으로 체온을 유지하며 구급대 도착 시까지 호흡 및 상태 관찰"
                 ]
             }
         ];
@@ -863,7 +890,71 @@
         // TAB 1: Render Selected Role Card
         function renderMyRoleCard() {
             const select = document.getElementById('myRoleSelect');
-            const roleName = select.value;
+            const roleName = select ? select.value : "";
+
+            if (!roleName) {
+                const defaultHtml = `
+                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-xl p-4 shadow-lg border border-slate-700 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-700 pb-2.5">
+                            <div>
+                                <span class="text-[10px] font-bold bg-amber-500 text-slate-900 px-2 py-0.5 rounded mr-1.5">공통 수칙</span>
+                                <span class="text-xs text-slate-300">전 임직원 대상</span>
+                                <h3 class="text-base font-extrabold text-white mt-0.5">화재 시 공통 대응 임무</h3>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+                                <i class="fa-solid fa-person-running"></i>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2.5 text-xs">
+                            <div class="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700/80">
+                                <span class="text-amber-400 font-bold block text-[11px] mb-1">
+                                    <i class="fa-solid fa-bullhorn mr-1"></i>1. 화재 신고 및 발신기 조작 방법
+                                </span>
+                                <ul class="text-slate-200 space-y-1 pl-1 list-disc list-inside text-[11.5px] font-medium leading-relaxed">
+                                    <li>최초 발견 시 즉시 큰 소리로 <strong>"불이야!"</strong>를 외쳐 주변에 상황을 전파합니다.</li>
+                                    <li>복도나 계단실 입구의 <strong>비상 발신기(적색 버튼)</strong>를 유리를 깨고 강하게 누릅니다.</li>
+                                    <li>안전한 장소 확보 후 119 및 상황실/안전환경팀에 화재 위치 및 상황을 신고합니다.</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700/80">
+                                <span class="text-emerald-400 font-bold block text-[11px] mb-1">
+                                    <i class="fa-solid fa-person-walking-arrow-right mr-1"></i>2. 화재 시 대피 요령 및 경로
+                                </span>
+                                <ul class="text-slate-200 space-y-1 pl-1 list-disc list-inside text-[11.5px] font-medium leading-relaxed">
+                                    <li>젖은 수건, 옷, 화재 대피마스크로 코와 입을 막고 자세를 낮춰 이동합니다.</li>
+                                    <li><strong>승강기(엘리베이터) 이용을 절대 금지</strong>하며, 비상계단을 이용하여 하강합니다.</li>
+                                    <li>피난 유도등 및 담당 구역 피난유도원의 안내에 적극 협조합니다.</li>
+                                    <li>대피 시 방화문은 연기 확산 방지를 위해 반드시 닫고 이동합니다.</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700/80">
+                                <span class="text-blue-400 font-bold block text-[11px] mb-1">
+                                    <i class="fa-solid fa-fire-extinguisher mr-1"></i>3. 초기 소화 수칙
+                                </span>
+                                <ul class="text-slate-200 space-y-1 pl-1 list-disc list-inside text-[11.5px] font-medium leading-relaxed">
+                                    <li>불길이 천장에 도달하지 않은 초기 화재에 한해 소화기 및 옥내소화전으로 진화합니다.</li>
+                                    <li>불길이 커지거나 천장에 닿으면 소화를 즉시 중단하고 피난 경로로 즉시 탈출합니다.</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700/80">
+                                <span class="text-red-400 font-bold block text-[11px] mb-1">
+                                    <i class="fa-solid fa-users-viewfinder mr-1"></i>4. 비상 집결지 도착 및 인원 파악
+                                </span>
+                                <ul class="text-slate-200 space-y-1 pl-1 list-disc list-inside text-[11.5px] font-medium leading-relaxed">
+                                    <li><strong>1차 집결지(건물 후문 앞 공터)</strong>로 신속 대피 후 소속 부서 피난유도원에게 본인의 대피를 확인받습니다.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('myRoleCardDisplay').innerHTML = defaultHtml;
+                return;
+            }
+
             const data = ORG_DATA.find(item => item.group === roleName);
 
             if (!data) return;
@@ -1058,14 +1149,21 @@
             document.getElementById('evacuationProgressBar').style.width = `${percentage}%`;
         }
 
-        function resetChecklist() {
-            if (confirm('모든 피난유도 체크리스트를 초기화하시겠습니까?')) {
-                evacChecklistState = {};
-                evacRemarksState = {};
-                saveChecklistState();
-                renderEvacTable();
-                showToast('체크리스트가 초기화되었습니다.');
-            }
+        function openResetModal() {
+            document.getElementById('resetModal').classList.remove('hidden');
+        }
+
+        function closeResetModal() {
+            document.getElementById('resetModal').classList.add('hidden');
+        }
+
+        function confirmResetChecklist() {
+            evacChecklistState = {};
+            evacRemarksState = {};
+            saveChecklistState();
+            closeResetModal();
+            renderEvacTable();
+            showToast('체크리스트가 초기화되었습니다.');
         }
 
         // TAB 4: Render Manuals
@@ -1081,9 +1179,34 @@
                         <i id="man-icon-${idx}" class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-200"></i>
                     </button>
                     <div id="man-content-${idx}" class="hidden p-3.5 bg-slate-50 border-t border-gray-100 text-xs">
-                        <ol class="space-y-1.5 list-decimal list-inside text-gray-700 font-medium">
+                        <ol class="space-y-2 list-decimal list-inside text-gray-700 font-medium">
                             ${item.steps.map(step => `<li class="leading-relaxed pl-1">${step}</li>`).join('')}
                         </ol>
+
+                        ${item.script ? `
+                        <div class="mt-3 bg-amber-50 border border-amber-200 p-2.5 rounded-lg text-amber-900">
+                            <span class="font-bold block text-[11px] mb-1 flex items-center">
+                                <i class="fa-solid fa-scroll mr-1 text-amber-600"></i> ※ 방송 멘트 예시:
+                            </span>
+                            <p class="text-[11px] leading-relaxed bg-white/70 p-2 rounded border border-amber-200 font-sans select-text">${item.script}</p>
+                        </div>
+                        ` : ''}
+
+                        <!-- 참고 영상 영역 -->
+                        <div class="mt-3 pt-2.5 border-t border-gray-200 flex items-center justify-between bg-white p-2.5 rounded-lg border border-gray-200">
+                            <span class="font-bold text-gray-700 flex items-center text-[11px]">
+                                <i class="fa-brands fa-youtube text-red-600 mr-1.5 text-sm"></i>참고 영상
+                            </span>
+                            ${item.videoUrl ? `
+                                <a href="${item.videoUrl}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-red-600 text-white rounded text-[10px] font-bold hover:bg-red-700 transition flex items-center shadow-sm">
+                                    유튜브 영상 시청 <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[9px]"></i>
+                                </a>
+                            ` : `
+                                <span class="text-[10px] text-gray-400 font-medium bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
+                                    영상 준비중
+                                </span>
+                            `}
+                        </div>
                     </div>
                 </div>
             `).join('');
