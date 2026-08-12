@@ -720,7 +720,7 @@
             { id: "EVAC_10", dept: "People팀 / Culture팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 4층 피난유도\nㅇ 잔류자 수색", area: "ㅇ 식당, 주방, 원익다움, 카페, 휴게실 대피 독려 → GATE1 or GATE2 대피유도\nㅇ 1번 · 2번 계단실 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 4층 → 집결지", note: "[복지] 식당, 카페, 직원휴게실\n[회의실] 원익다움\n[업무] 방재실, 문서고" }
         ];
 
-        // 4. 매뉴얼 데이터 (개별 고유 YouTube 링크 포함)
+        // 4. 매뉴얼 데이터 (비상방송장비에 상세 매뉴얼 링크 포함)
         const MANUAL_DATA = [
             {
                 title: "소화기 사용방법",
@@ -812,7 +812,9 @@
                     "침착하게 화재 사실을 알리는 비상방송 멘트를 송출합니다."
                 ],
                 scriptNotice: "※ 멘트 예시 :\n안전환경팀에서 안내 드립니다. 현재 건물 내에 화재경보가 작동 중입니다. 건물 내에 계신 분들께서는 당황하지 마시고 비상구 안내 표시를 따라 안전하게 건물 밖으로 대피해 주시기 바랍니다. 피난유도반원들께서는 즉시 담당 위치에서 대피 유도를 시작해 주시기 바랍니다.\n다시 한 번 안내 드립니다. 현재 건물 내에 화재경보가 작동 중입니다. 건물 내에 계신 분들께서는 당황하지 마시고 비상구 안내 표시를 따라 안전하게 건물 밖으로 대피해 주시기 바랍니다. 피난유도반원들께서는 즉시 담당 위치에서 대피 유도를 시작해 주시기 바랍니다.",
-                videoUrl: "https://www.youtube.com/watch?v=mO-zTqpvg9k"
+                videoUrl: "https://www.youtube.com/watch?v=mO-zTqpvg9k",
+                docUrl: "https://hyunjiklee119-collab.github.io/EPM_V2/",
+                docLabel: "상세 비상방송 매뉴얼"
             },
             {
                 title: "심폐소생술(CPR) 및 AED",
@@ -1151,7 +1153,7 @@
             showToast('체크리스트가 초기화되었습니다.');
         }
 
-        // TAB 4: Render Manuals
+        // TAB 4: Render Manuals (비상방송 외부 문서 링크 추가 지원)
         function renderManuals() {
             const container = document.getElementById('manualContainer');
             container.innerHTML = MANUAL_DATA.map((item, idx) => `
@@ -1171,6 +1173,18 @@
                         ${item.scriptNotice ? `
                         <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-lg text-amber-900 font-medium whitespace-pre-line text-[11px] leading-relaxed">
                             ${item.scriptNotice}
+                        </div>
+                        ` : ''}
+
+                        ${item.docUrl ? `
+                        <div class="pt-2 border-t border-gray-200/80 flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-700 flex items-center">
+                                <i class="fa-solid fa-file-lines text-blue-600 text-sm mr-1.5"></i>
+                                상세 웹 매뉴얼
+                            </span>
+                            <a href="${item.docUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] shadow-sm transition active-ring">
+                                <i class="fa-solid fa-arrow-up-right-from-square mr-1 text-xs"></i> ${item.docLabel || '상세 매뉴얼'}
+                            </a>
                         </div>
                         ` : ''}
 
