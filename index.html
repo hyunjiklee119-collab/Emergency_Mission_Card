@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>비상대응조직 임무카드 & 피난유도 시스템</title>
+    <title>비상대응조직 임무카드 & 피난유도 관제 시스템</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome CDN for Icons -->
@@ -51,24 +51,36 @@
         .active-ring:active {
             transform: scale(0.98);
         }
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(1.02); }
+        }
+        .animate-live-badge {
+            animation: pulse-subtle 2s infinite ease-in-out;
+        }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 pb-20 select-none">
+<body class="bg-slate-100 text-gray-800 pb-20 select-none antialiased">
 
     <!-- Top Header -->
     <header class="sticky top-0 z-40 bg-navy-900 text-white shadow-lg border-b border-red-600/30">
-        <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-2.5">
                 <div class="w-9 h-9 rounded-full bg-red-600 flex items-center justify-center animate-pulse shadow-md">
                     <i class="fa-solid fa-fire-extinguisher text-white text-base"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-base sm:text-lg tracking-tight leading-tight">비상대응조직 임무카드</h1>
-                    <p class="text-[10px] sm:text-xs text-gray-400">원익홀딩스 화재대응 & 피난유도</p>
+                    <h1 class="font-bold text-base sm:text-lg tracking-tight leading-tight flex items-center gap-1.5">
+                        비상대응조직 임무카드
+                        <span id="syncStatusBadge" class="text-[10px] font-semibold bg-emerald-600/90 text-white px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                            <i class="fa-solid fa-cloud-check text-[9px]"></i> 자동연동
+                        </span>
+                    </h1>
+                    <p class="text-[10px] sm:text-xs text-gray-400">원익홀딩스 화재대응 & 실시간 피난유도 관제</p>
                 </div>
             </div>
             <div class="flex items-center space-x-2">
-                <button onclick="openSettingsModal()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-gray-300 transition" title="구글시트 연동 설정">
+                <button onclick="openSettingsModal()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-gray-300 transition" title="구글시트 연동 및 가이드">
                     <i class="fa-solid fa-gear text-sm"></i>
                 </button>
                 <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-red-800/80 text-red-100 border border-red-500 shadow-sm">
@@ -78,7 +90,7 @@
         </div>
     </header>
 
-    <main class="max-w-2xl mx-auto px-3.5 sm:px-5 pt-3.5">
+    <main class="max-w-4xl mx-auto px-3.5 sm:px-5 pt-3.5">
 
         <!-- ==================== TAB 1: 내 임무 ==================== -->
         <section id="tab-1" class="tab-content space-y-4">
@@ -202,49 +214,56 @@
             </div>
         </section>
 
-        <!-- ==================== TAB 3: 피난유도반 ==================== -->
+        <!-- ==================== TAB 3: 피난유도 (현장 요원용) ==================== -->
         <section id="tab-3" class="tab-content hidden space-y-4">
             
-            <!-- ① 피난유도반 공통 임무 -->
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 shadow-sm">
-                <h2 class="text-xs font-bold text-amber-900 uppercase tracking-wider mb-2 flex items-center">
-                    <i class="fa-solid fa-bullhorn mr-1.5 text-amber-600"></i>
-                    피난유도반 공통 수칙
-                </h2>
+            <!-- ① 피난유도반 공통 임무 & 자동 전송 안내 배너 -->
+            <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-3.5 shadow-sm">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center">
+                        <i class="fa-solid fa-bullhorn mr-1.5 text-amber-600"></i>
+                        피난유도반 현장 행동 수칙
+                    </h2>
+                    <span class="text-[10px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded shadow-sm flex items-center gap-1">
+                        <i class="fa-solid fa-bolt"></i> 완료 체크 시 구글시트 즉시 자동 전송
+                    </span>
+                </div>
                 <ul class="text-xs text-amber-900 space-y-1 font-medium pl-1">
                     <li class="flex items-start">
                         <span class="text-amber-600 font-bold mr-1.5">•</span>
-                        <span><strong>비상연락 및 전파:</strong> 담당 구역 화재 발생 상태 전파 및 즉시 대피 명령</span>
+                        <span><strong>원터치 자동보고:</strong> 대피완료 체크 시 지휘본부 관제 대시보드 및 구글 시트로 실시간 반영됩니다.</span>
                     </li>
                     <li class="flex items-start">
                         <span class="text-amber-600 font-bold mr-1.5">•</span>
-                        <span><strong>피난경로 확보:</strong> 방화문 개방 상태 점검 및 안전 대피로 우선 확보</span>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-amber-600 font-bold mr-1.5">•</span>
-                        <span><strong>잔류자 확인:</strong> 사각지대(화장실, 회의실, 휴게실) 정밀 수색 후 대피 완료 보고</span>
+                        <span><strong>잔류자 발생 시:</strong> 체크 시 뜨는 팝업에 잔류 인원 및 위치를 즉시 기록해 주세요.</span>
                     </li>
                 </ul>
             </div>
 
-            <!-- Realtime Status Dashboard -->
+            <!-- Realtime Status Summary & Filter -->
             <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-200 space-y-3">
                 <div class="flex items-center justify-between mb-1">
-                    <h3 class="text-sm font-bold text-gray-800">구역별 수색 & 대피 현황</h3>
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-sm font-bold text-gray-800">구역별 수색 & 대피 현황</h3>
+                        <span id="autoSyncMiniIndicator" class="text-[11px] text-gray-500 flex items-center gap-1">
+                            <i class="fa-solid fa-circle text-[8px] text-emerald-500"></i> 준비됨
+                        </span>
+                    </div>
                     <div class="text-xs font-bold">
                         <span id="completedCount" class="text-emerald-600 font-extrabold text-sm">0</span> / <span id="totalCount" class="text-gray-600">10</span> 구역 완료
+                        <span id="progressPercentText" class="text-blue-600 ml-1">(0%)</span>
                     </div>
                 </div>
                 <!-- Progress Bar -->
-                <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                    <div id="evacuationProgressBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
+                    <div id="evacuationProgressBar" class="bg-emerald-500 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
                 
-                <!-- Filter Dropdown -->
-                <div class="pt-1">
-                    <select id="evacFilter" onchange="renderEvacTable()" class="w-full bg-white border border-gray-300 text-xs rounded-lg p-2.5 font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
-                        <option value="">전체 구역 보기 (전체 목록)</option>
-                        <option value="EVAC_01">ㅇ 집결지 통제 / 피난유도반장 : SKH영업팀 / 글로벌영업팀</option>
+                <!-- Filter Dropdown & Quick Actions -->
+                <div class="pt-1 flex flex-col sm:flex-row gap-2">
+                    <select id="evacFilter" onchange="renderEvacTable()" class="flex-1 bg-white border border-gray-300 text-xs rounded-lg p-2.5 font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
+                        <option value="">전체 구역 보기 (10개 구역 전체)</option>
+                        <option value="EVAC_01">ㅇ 집결지 통제 : SKH영업팀 / 글로벌영업팀</option>
                         <option value="EVAC_02">ㅇ 지하층 피난유도 : 연구소</option>
                         <option value="EVAC_03">ㅇ 1층#1 & 2층#1 피난유도 : 구매팀</option>
                         <option value="EVAC_04">ㅇ 1층#2 피난유도 : 품질G</option>
@@ -255,6 +274,10 @@
                         <option value="EVAC_09">ㅇ 3층#3 피난유도 : 정보전략팀</option>
                         <option value="EVAC_10">ㅇ 4층 피난유도 : People팀 / Culture팀</option>
                     </select>
+
+                    <button onclick="switchTab(4)" class="bg-navy-900 hover:bg-slate-800 text-white font-bold px-3 py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 shrink-0 shadow transition">
+                        <i class="fa-solid fa-chart-line text-amber-400"></i> 상황실 대시보드 보기
+                    </button>
                 </div>
             </div>
 
@@ -264,8 +287,8 @@
             </div>
 
             <div class="pt-2 flex gap-2">
-                <button onclick="submitEvacuationStatus()" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-lg text-xs hover:bg-emerald-700 transition flex items-center justify-center shadow">
-                    <i class="fa-solid fa-cloud-arrow-up mr-2"></i> 구글 시트로 대피 현황 전송
+                <button onclick="forceManualSync()" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-lg text-xs hover:bg-blue-700 transition flex items-center justify-center shadow">
+                    <i class="fa-solid fa-rotate mr-2"></i> 구글 시트 전체 강제 동기화
                 </button>
                 <button onclick="openResetModal()" class="bg-gray-200 text-gray-700 font-bold px-4 py-2.5 rounded-lg text-xs hover:bg-gray-300 transition shrink-0">
                     초기화
@@ -274,8 +297,104 @@
 
         </section>
 
-        <!-- ==================== TAB 4: 매뉴얼 ==================== -->
-        <section id="tab-4" class="tab-content hidden space-y-3">
+        <!-- ==================== TAB 4: 상황관제 대시보드 (종합상황실) ==================== -->
+        <section id="tab-4" class="tab-content hidden space-y-4">
+            
+            <!-- 대시보드 상단 헤더 & 컨트롤 -->
+            <div class="bg-navy-900 text-white rounded-xl p-4 shadow-lg border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
+                        <h2 class="text-base font-extrabold tracking-tight">비상상황실 종합 대피관제 모니터</h2>
+                    </div>
+                    <p class="text-xs text-gray-300 mt-1">구글 시트 연동 기반 실시간 잔류자 수색 및 피난현황 집계</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span id="dashboardLastUpdate" class="text-[11px] text-gray-400 bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700">
+                        동기화 대기중
+                    </span>
+                    <button onclick="refreshDashboardData(true)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition shadow">
+                        <i class="fa-solid fa-arrows-rotate" id="dashRefreshIcon"></i> 새로고침
+                    </button>
+                </div>
+            </div>
+
+            <!-- 대시보드 핵심 KPI 카드 (4분할) -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm text-center">
+                    <span class="text-xs text-gray-500 font-medium">대피 진행률</span>
+                    <div id="dashKpiPercent" class="text-2xl font-black text-blue-600 mt-1">0%</div>
+                    <div class="text-[10px] text-gray-400 mt-0.5">목표: 100% 완료</div>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm text-center">
+                    <span class="text-xs text-gray-500 font-medium">완료 구역</span>
+                    <div id="dashKpiCompleted" class="text-2xl font-black text-emerald-600 mt-1">0 <span class="text-sm font-semibold text-gray-500">/ 10</span></div>
+                    <div class="text-[10px] text-emerald-600 font-bold mt-0.5">안전 확보</div>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm text-center">
+                    <span class="text-xs text-gray-500 font-medium">수색 중 / 잔류</span>
+                    <div id="dashKpiRemaining" class="text-2xl font-black text-red-600 mt-1">10</div>
+                    <div class="text-[10px] text-red-500 font-bold mt-0.5">미확인 구역</div>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm text-center">
+                    <span class="text-xs text-gray-500 font-medium">특이사항/잔류자</span>
+                    <div id="dashKpiRemarks" class="text-2xl font-black text-amber-500 mt-1">0</div>
+                    <div class="text-[10px] text-amber-600 font-bold mt-0.5">주의 및 조치요망</div>
+                </div>
+            </div>
+
+            <!-- 대피 현황 종합 바 -->
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-2">
+                <div class="flex justify-between items-center text-xs font-bold">
+                    <span class="text-gray-700">전사 피난완료 게이지</span>
+                    <span id="dashProgressLabel" class="text-emerald-700">0 / 10 구역 완료</span>
+                </div>
+                <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden p-0.5">
+                    <div id="dashMainProgressBar" class="bg-gradient-to-r from-emerald-500 to-teal-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- 층별 및 구역별 실시간 그리드 매트릭스 -->
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
+                <div class="flex items-center justify-between border-b pb-2.5">
+                    <h3 class="text-sm font-extrabold text-gray-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-layer-group text-blue-600"></i>
+                        층별 피난 & 잔류 수색 현황판
+                    </h3>
+                    <div class="flex items-center gap-3 text-xs">
+                        <span class="flex items-center gap-1 font-semibold text-emerald-700">
+                            <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> 완료
+                        </span>
+                        <span class="flex items-center gap-1 font-semibold text-rose-700">
+                            <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span> 미완료
+                        </span>
+                        <span class="flex items-center gap-1 font-semibold text-amber-700">
+                            <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> 특이사항
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 10개 구역 시각적 카드 매트릭스 -->
+                <div id="dashboardGridContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <!-- Dynamic Dashboard Grid Items -->
+                </div>
+            </div>
+
+            <!-- 실시간 특이사항 & 구조요청 피드 -->
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
+                <h3 class="text-sm font-extrabold text-gray-900 flex items-center gap-1.5">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
+                    현장 특이사항 및 잔류자 긴급 피드
+                </h3>
+                <div id="dashboardRemarksFeed" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                    <!-- Dynamic Remarks Feed -->
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ==================== TAB 5: 매뉴얼 (기존 탭4) ==================== -->
+        <section id="tab-5" class="tab-content hidden space-y-3">
             
             <!-- ① 비상연락망 (최상단) -->
             <div class="bg-white rounded-xl shadow-sm border border-red-200 overflow-hidden">
@@ -458,35 +577,40 @@
 
     </main>
 
-    <!-- Bottom Mobile Nav Tabs -->
-    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-lg max-w-2xl mx-auto">
-        <div class="grid grid-cols-4 h-16">
+    <!-- Bottom Mobile Nav Tabs (5-Tabs) -->
+    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-lg max-w-4xl mx-auto">
+        <div class="grid grid-cols-5 h-16">
             <button onclick="switchTab(1)" id="nav-tab-1" class="nav-btn text-red-600 flex flex-col items-center justify-center space-y-1">
-                <i class="fa-solid fa-user-shield text-lg"></i>
-                <span class="text-[11px] font-bold">내 임무</span>
+                <i class="fa-solid fa-user-shield text-base"></i>
+                <span class="text-[10px] font-bold">내 임무</span>
             </button>
             <button onclick="switchTab(2)" id="nav-tab-2" class="nav-btn text-gray-400 flex flex-col items-center justify-center space-y-1">
-                <i class="fa-solid fa-triangle-exclamation text-lg"></i>
-                <span class="text-[11px] font-bold">유형별 대응</span>
+                <i class="fa-solid fa-triangle-exclamation text-base"></i>
+                <span class="text-[10px] font-bold">유형별대응</span>
             </button>
             <button onclick="switchTab(3)" id="nav-tab-3" class="nav-btn text-gray-400 flex flex-col items-center justify-center space-y-1">
-                <i class="fa-solid fa-clipboard-check text-lg"></i>
-                <span class="text-[11px] font-bold">피난유도</span>
+                <i class="fa-solid fa-clipboard-check text-base"></i>
+                <span class="text-[10px] font-bold">피난유도</span>
             </button>
-            <button onclick="switchTab(4)" id="nav-tab-4" class="nav-btn text-gray-400 flex flex-col items-center justify-center space-y-1">
-                <i class="fa-solid fa-book-medical text-lg"></i>
-                <span class="text-[11px] font-bold">매뉴얼</span>
+            <button onclick="switchTab(4)" id="nav-tab-4" class="nav-btn text-gray-400 flex flex-col items-center justify-center space-y-1 relative">
+                <span class="absolute top-2 right-4 w-2 h-2 rounded-full bg-red-500"></span>
+                <i class="fa-solid fa-chart-line text-base"></i>
+                <span class="text-[10px] font-bold">상황관제</span>
+            </button>
+            <button onclick="switchTab(5)" id="nav-tab-5" class="nav-btn text-gray-400 flex flex-col items-center justify-center space-y-1">
+                <i class="fa-solid fa-book-medical text-base"></i>
+                <span class="text-[10px] font-bold">매뉴얼</span>
             </button>
         </div>
     </nav>
 
     <!-- Settings Modal -->
     <div id="settingsModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-sm w-full p-5 shadow-2xl space-y-4">
+        <div class="bg-white rounded-xl max-w-lg w-full p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-3">
                 <h3 class="font-bold text-base text-gray-900 flex items-center">
                     <i class="fa-solid fa-file-csv text-green-600 mr-2"></i>
-                    구글 시트 연동 설정
+                    구글 시트 실시간 양방향 연동 설정
                 </h3>
                 <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-gray-600">
                     <i class="fa-solid fa-xmark text-lg"></i>
@@ -494,22 +618,54 @@
             </div>
             
             <div class="space-y-2 text-xs">
-                <p class="text-gray-600">피난유도 체크리스트 실시간 전송을 위한 Google Apps Script 웹앱 URL을 입력하세요.</p>
+                <p class="text-gray-600 leading-relaxed">
+                    피난유도 체크리스트 실시간 전송 및 상황실 대시보드 조회를 위한 Google Apps Script 웹앱 URL을 입력하세요.
+                </p>
                 <div>
                     <label class="block font-bold text-gray-700 mb-1">Apps Script Web App URL</label>
                     <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full border rounded-lg p-2.5 text-xs bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
             </div>
 
-            <div class="bg-slate-50 p-3 rounded-lg text-[11px] text-gray-600 space-y-1 border border-slate-200">
-                <p class="font-bold text-slate-800">💡 Google Apps Script 설정 안내:</p>
-                <p>1. Google Sheets 생성 후 [확장 프로그램] → [Apps Script] 클릭</p>
-                <p>2. `doPost(e)` 함수 작성 후 웹앱 배포 (액세스 권한: 모든 사용자)</p>
-                <p>3. 생성된 웹앱 URL을 위 입력창에 저장합니다.</p>
+            <!-- Apps Script 코드 제공 안내 -->
+            <div class="bg-slate-50 p-3 rounded-lg text-[11px] text-gray-600 space-y-2 border border-slate-200">
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-slate-800">💡 Google Apps Script 코드 예시:</span>
+                    <button onclick="copyAppsScriptCode()" class="text-blue-600 hover:underline font-bold text-[10px]">
+                        <i class="fa-regular fa-copy mr-0.5"></i>스크립트 복사
+                    </button>
+                </div>
+                <p class="text-[10px] text-gray-500">
+                    구글 시트 [확장 프로그램] → [Apps Script]에 아래 코드를 넣고 <strong>배포(웹앱, 액세스 권한: 모든 사용자)</strong>하면 대피체크 즉시 구글시트에 기록되고 대시보드와 연동됩니다.
+                </p>
+                <textarea id="appsScriptTemplate" readonly rows="5" class="w-full bg-slate-900 text-slate-200 p-2 rounded text-[10px] font-mono leading-tight">
+function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(["전송시각", "구역ID", "부서명", "담당자", "담당구역", "대피상태", "특이사항"]);
+  }
+  if (data.singleUpdate) {
+    var item = data.singleUpdate;
+    sheet.appendRow([new Date(), item.id, item.dept, item.name, item.area, item.status, item.remark]);
+  } else if (data.checklist) {
+    data.checklist.forEach(function(item) {
+      sheet.appendRow([new Date(), item.id, item.dept, item.name, item.area, item.status, item.remark]);
+    });
+  }
+  return ContentService.createTextOutput(JSON.stringify({result:"success"})).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = sheet.getDataRange().getValues();
+  return ContentService.createTextOutput(JSON.stringify({rows: data})).setMimeType(ContentService.MimeType.JSON);
+}
+</textarea>
             </div>
 
             <div class="flex gap-2 pt-2">
-                <button onclick="saveSettings()" class="w-full bg-blue-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-blue-700 transition">
+                <button onclick="saveSettings()" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-lg text-xs hover:bg-blue-700 transition">
                     저장하기
                 </button>
             </div>
@@ -524,7 +680,7 @@
                     <i class="fa-solid fa-pen-to-square text-amber-500 mr-2"></i>
                     대피 특이사항 / 잔류자 입력
                 </h3>
-                <button onclick="closeRemarkModal(false)" class="text-gray-400 hover:text-gray-600">
+                <button onclick="closeRemarkModal(true)" class="text-gray-400 hover:text-gray-600">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -534,15 +690,15 @@
             </p>
 
             <div>
-                <textarea id="remarkInput" rows="3" placeholder="예: 회의실 미대피자 1명 발견(이송중) / 특이사항 없으면 SKIP 클릭" class="w-full border rounded-lg p-2.5 text-xs bg-gray-50 focus:ring-2 focus:ring-amber-500 outline-none resize-none"></textarea>
+                <textarea id="remarkInput" rows="3" placeholder="예: 회의실 미대피자 1명 발견(보조요원 인솔 중) / 특이사항 없으면 '특이사항 없음' 또는 SKIP" class="w-full border rounded-lg p-2.5 text-xs bg-gray-50 focus:ring-2 focus:ring-amber-500 outline-none resize-none"></textarea>
             </div>
 
             <div class="grid grid-cols-2 gap-2 pt-1">
                 <button onclick="confirmRemark(true)" class="bg-emerald-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-emerald-700 transition shadow">
-                    <i class="fa-solid fa-check mr-1"></i> 특이사항 저장
+                    <i class="fa-solid fa-check mr-1"></i> 특이사항 저장 및 완료
                 </button>
                 <button onclick="confirmRemark(false)" class="bg-gray-200 text-gray-700 font-bold py-2 rounded-lg text-xs hover:bg-gray-300 transition">
-                    SKIP (없음)
+                    이상 없음 (대피완료)
                 </button>
             </div>
         </div>
@@ -706,21 +862,21 @@
             }
         ];
 
-        // 3. 피난유도반 상세 구역 데이터 (총 10개 구역)
+        // 3. 피난유도반 상세 구역 데이터 (10개 구역)
         const EVAC_DATA = [
-            { id: "EVAC_01", dept: "SKH영업팀 / 글로벌영업팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 집결지 통제 / 피난유도반장", area: "ㅇ 비상 집결지 선점 → 부서별 집결 및 인원 파악 안내\nㅇ 옥외 집결지 안전 통제", route: "업무공간 → 옥외 집결지", note: "[안전관리] 차량 통행 시 우회로 안내, 보행자 안전사고 시 보고" },
-            { id: "EVAC_02", dept: "연구소", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 지하층 피난유도\nㅇ 잔류자 수색", area: "ㅇ 지하층 : LAB실, 제조창고, 기계실, 변전실 잔류자 확인 및 대피 독려\nㅇ GATE 5 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 지하층 → 집결지", note: "[연구] LAB실\n[창고] 제조창고, WRS창고\n[기타] 미화휴게실" },
-            { id: "EVAC_03", dept: "구매팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 1층#1 피난유도\nㅇ 2층#1 피난유도\nㅇ 잔류자 수색", area: "ㅇ 2층 피트니스, 1층 교육장, 대회의실, 중회의실, 로비 대피 독려\nㅇ GATE1 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 2층#1 → 1층#1 → 집결지", note: "[복지] 2층 피트니스, 휴게실\n[기타] 1층 로비\n[회의실] 1층 교육장, 접견실, 소회의실, 중회의실, 대회의실" },
-            { id: "EVAC_04", dept: "품질G", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 1층#2 피난유도\nㅇ 잔류자 수색", area: "ㅇ GPU크린룸, 품질분석실 대피 독려 → GATE 2 대피 유도\nㅇ GATE2 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 1층#2 → 집결지", note: "[업무] GPU룸, GPU준비실, GPU용접실, GPU최종검사, 품질분석실, 자재창고" },
-            { id: "EVAC_05", dept: "생산기술팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 1층#3 피난유도\nㅇ 2층#2 피난유도\nㅇ 잔류자 수색", area: "ㅇ 주안100존, 협력사벤더룸(1층,2층) 대피 독려 → GATE3 대피 유도\nㅇ GATE3 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 1층#3 → 2층#2 → 집결지", note: "[협력사] 1층 벤더룸1~5, 2층 벤더룸6~10\n[업무] 주안100존, 100존 TC" },
-            { id: "EVAC_06", dept: "제조팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 1층#4 피난유도\nㅇ 잔류자 수색", area: "ㅇ GSS크린룸, TC룸, 제품창고, 출하장 대피 독려 → GATE 4 대피 유도\nㅇ GATE4 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 1층#4 → 집결지", note: "[업무] GSS룸, GSS PA룸, IGS룸, GSS 최종검사, TC룸, 소모품창고, 출하장" },
-            { id: "EVAC_07", dept: "재무팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 3층#1 피난유도\nㅇ 잔류자 수색", area: "ㅇ 인사본부 · 경영지원본부 · 영업팀 WS 대피 독려 → 계단실 #1로 대피유도, 피난\nㅇ 1번 계단실 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 3층#1 → 집결지", note: "[업무] 인사본부 WS, 경영지원본부 WS, 영업팀 WS, CS팀 WS" },
-            { id: "EVAC_08", dept: "기획팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 3층#2 피난유도\nㅇ 잔류자 수색", area: "ㅇ 연구소 · 제조팀 · 생산기술팀 WS 대피 독려 → 계단실 #2로 대피 유도\nㅇ 2번 계단실 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 3층#2 → 집결지", note: "[업무] 연구소 WS, 제조팀 WS, 생산기술팀 WS" },
-            { id: "EVAC_09", dept: "정보전략팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 3층#3 피난유도\nㅇ 잔류자 수색", area: "ㅇ 임원실 / 회의실 / 부속실 대피 독려\nㅇ 전산실/서버실, 제품TEST실/제어TEST실, 공조실 대피 독려 및 최종 퇴실 보고", route: "업무공간 → 3층 회의실/임원실 등 → 전산실/공조실 등 → 집결지", note: "[회의실] 자유A, 자유B, 자유C, 자유D, 소통A, 소통B, 행복A, 행복B, 대회의실, 중회의실\n[임원실] 대표이사실, COO실\n[인프라] 전산실, 서버실, 공조실, 자재창고\n[부속실] 고객지원 창고, 탕비실, 통화부스, 화장실, 제품TEST실, 제어TEST실" },
-            { id: "EVAC_10", dept: "People팀 / Culture팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 4층 피난유도\nㅇ 잔류자 수색", area: "ㅇ 식당, 주방, 원익다움, 카페, 휴게실 대피 독려 → GATE1 or GATE2 대피유도\nㅇ 1번 · 2번 계단실 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 4층 → 집결지", note: "[복지] 식당, 카페, 직원휴게실\n[회의실] 원익다움\n[업무] 방재실, 문서고" }
+            { id: "EVAC_01", floor: "집결지", dept: "영업팀 / 글로벌영업팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 집결지 통제", area: "ㅇ 비상 집결지 선점 → 부서별 집결 및 인원 파악 안내\nㅇ 옥외 집결지 안전 통제", route: "업무공간 → 옥외 집결지", note: "[안전관리] 차량 통행 시 우회로 안내, 보행자 안전사고 시 보고" },
+            { id: "EVAC_02", floor: "지하층", dept: "연구소", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 지하층 피난유도\nㅇ 잔류자 수색", area: "ㅇ 지하층 : LAB실, 제조창고, 기계실, 변전실 잔류자 확인 및 대피 독려\nㅇ GATE 5 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 지하층 → 집결지", note: "[연구] LAB실\n[창고] 제조창고, WRS창고\n[기타] 미화휴게실" },
+            { id: "EVAC_03", floor: "1·2층", dept: "구매팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 1층#1 피난유도\nㅇ 2층#1 피난유도\nㅇ 잔류자 수색", area: "ㅇ 2층 피트니스, 1층 교육장, 대회의실, 중회의실, 로비 대피 독려\nㅇ GATE1 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 2층#1 → 1층#1 → 집결지", note: "[복지] 2층 피트니스, 휴게실\n[기타] 1층 로비\n[회의실] 1층 교육장, 접견실, 소회의실, 중회의실, 대회의실" },
+            { id: "EVAC_04", floor: "1층", dept: "품질G", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 1층#2 피난유도\nㅇ 잔류자 수색", area: "ㅇ GPU크린룸, 품질분석실 대피 독려 → GATE 2 대피 유도\nㅇ GATE2 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 1층#2 → 집결지", note: "[업무] GPU룸, GPU준비실, GPU용접실, GPU최종검사, 품질분석실, 자재창고" },
+            { id: "EVAC_05", floor: "1·2층", dept: "생산기술팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 1층#3 피난유도\nㅇ 2층#2 피난유도\nㅇ 잔류자 수색", area: "ㅇ 주안100존, 협력사벤더룸(1층,2층) 대피 독려 → GATE3 대피 유도\nㅇ GATE3 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 1층#3 → 2층#2 → 집결지", note: "[협력사] 1층 벤더룸1~5, 2층 벤더룸6~10\n[업무] 주안100존, 100존 TC" },
+            { id: "EVAC_06", floor: "1층", dept: "제조팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 1층#4 피난유도\nㅇ 잔류자 수색", area: "ㅇ GSS크린룸, TC룸, 제품창고, 출하장 대피 독려 → GATE 4 대피 유도\nㅇ GATE4 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 1층#4 → 집결지", note: "[업무] GSS룸, GSS PA룸, IGS룸, GSS 최종검사, TC룸, 소모품창고, 출하장" },
+            { id: "EVAC_07", floor: "3층", dept: "재무팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 3층#1 피난유도\nㅇ 잔류자 수색", area: "ㅇ 인사본부 · 경영지원본부 · 영업팀 WS 대피 독려 → 계단실 #1로 대피유도, 피난\nㅇ 1번 계단실 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 3층#1 → 집결지", note: "[업무] 인사본부 WS, 경영지원본부 WS, 영업팀 WS, CS팀 WS" },
+            { id: "EVAC_08", floor: "3층", dept: "기획팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 3층#2 피난유도\nㅇ 잔류자 수색", area: "ㅇ 연구소 · 제조팀 · 생산기술팀 WS 대피 독려 → 계단실 #2로 대피 유도\nㅇ 2번 계단실 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 3층#2 → 집결지", note: "[업무] 연구소 WS, 제조팀 WS, 생산기술팀 WS" },
+            { id: "EVAC_09", floor: "3층", dept: "정보전략팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 3층#3 피난유도\nㅇ 잔류자 수색", area: "ㅇ 임원실 / 회의실 / 부속실 대피 독려\nㅇ 전산실/서버실, 제품TEST실/제어TEST실, 공조실 대피 독려 및 최종 퇴실 보고", route: "업무공간 → 3층 회의실/임원실 등 → 전산실/공조실 등 → 집결지", note: "[회의실] 자유A, 자유B, 자유C, 자유D, 소통A, 소통B, 행복A, 행복B, 대회의실, 중회의실\n[임원실] 대표이사실, COO실\n[인프라] 전산실, 서버실, 공조실, 자재창고\n[부속실] 고객지원 창고, 탕비실, 통화부스, 화장실, 제품TEST실, 제어TEST실" },
+            { id: "EVAC_10", floor: "4층", dept: "People팀 / Culture팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 4층 피난유도\nㅇ 잔류자 수색", area: "ㅇ 식당, 주방, 원익다움, 카페, 휴게실 대피 독려 → GATE1 or GATE2 대피유도\nㅇ 1번 · 2번 계단실 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 4층 → 집결지", note: "[복지] 식당, 카페, 직원휴게실\n[회의실] 원익다움\n[업무] 방재실, 문서고" }
         ];
 
-        // 4. 매뉴얼 데이터 (비상방송장비에 상세 매뉴얼 링크 포함)
+        // 4. 매뉴얼 데이터
         const MANUAL_DATA = [
             {
                 title: "소화기 사용방법",
@@ -785,7 +941,7 @@
                 icon: "fa-toggle-on",
                 steps: [
                     "소화약제 방출 구역 내에 인원이 남아있지 않은지 완벽한 대피를 확인합니다.",
-                    "수동조작함(기동장치)의 수동버튼 보호덮개를 여옵니다.",
+                    "수동조작함(기동장치)의 수동버튼 보호덮개를 엽니다.",
                     "기동 스위치(버튼)를 강하게 누릅니다.",
                     "방출 경보음 및 표시등 점등을 확인하고 즉시 해당 방출 구역을 탈출합니다."
                 ],
@@ -811,7 +967,7 @@
                     "EP-6216 장비의 비상마이크를 들고 'PTT 버튼'을 누른 채로 육성 방송을 송출합니다.",
                     "침착하게 화재 사실을 알리는 비상방송 멘트를 송출합니다."
                 ],
-                scriptNotice: "※ 멘트 예시 :\n안전환경팀에서 안내 드립니다. 현재 건물 내에 화재경보가 작동 중입니다. 건물 내에 계신 분들께서는 당황하지 마시고 비상구 안내 표시를 따라 안전하게 건물 밖으로 대피해 주시기 바랍니다. 피난유도반원들께서는 즉시 담당 위치에서 대피 유도를 시작해 주시기 바랍니다.\n다시 한 번 안내 드립니다. 현재 건물 내에 화재경보가 작동 중입니다. 건물 내에 계신 분들께서는 당황하지 마시고 비상구 안내 표시를 따라 안전하게 건물 밖으로 대피해 주시기 바랍니다. 피난유도반원들께서는 즉시 담당 위치에서 대피 유도를 시작해 주시기 바랍니다.",
+                scriptNotice: "※ 멘트 예시 :\n안전환경팀에서 안내 드립니다. 현재 건물 내에 화재경보가 작동 중입니다. 건물 내에 계신 분들께서는 당황하지 마시고 비상구 안내 표시를 따라 안전하게 건물 밖으로 대피해 주시기 바랍니다. 피난유도반원들께서는 즉시 담당 위치에서 대피 유도를 시작해 주시기 바랍니다.",
                 videoUrl: "https://www.youtube.com/watch?v=mO-zTqpvg9k",
                 docUrl: "https://hyunjiklee119-collab.github.io/EPM_V2/",
                 docLabel: "상세 비상방송 매뉴얼"
@@ -855,6 +1011,8 @@
         let evacChecklistState = {};
         let evacRemarksState = {};
         let currentActiveZoneId = null;
+        let lastSyncTimestamp = null;
+        let isSyncing = false;
 
         function loadChecklistState() {
             const saved = localStorage.getItem('EVAC_CHECKLIST_STATE');
@@ -879,9 +1037,8 @@
             localStorage.setItem('EVAC_CHECKLIST_STATE', JSON.stringify(evacChecklistState));
             localStorage.setItem('EVAC_REMARKS_STATE', JSON.stringify(evacRemarksState));
             updateEvacProgress();
+            renderDashboard();
         }
-
-        /* ==================== UI RENDERERS & EVENT HANDLERS ==================== */
 
         // Tab Switcher
         function switchTab(tabIndex) {
@@ -899,10 +1056,13 @@
                 activeNav.classList.add('text-red-600');
             }
 
+            if (tabIndex === 4) {
+                renderDashboard();
+            }
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // TAB 1: Render Selected Role Card
         function renderMyRoleCard() {
             const select = document.getElementById('myRoleSelect');
             const roleName = select ? select.value : "";
@@ -989,7 +1149,6 @@
             document.getElementById('myRoleCardDisplay').innerHTML = html;
         }
 
-        // TAB 2: Render Incident Accordion List
         function renderIncidentAccordion() {
             const container = document.getElementById('incidentAccordionContainer');
             if (!container) return;
@@ -1024,7 +1183,6 @@
             icon.classList.toggle('rotate-180');
         }
 
-        // TAB 3: Render Evacuation Checklist
         function renderEvacTable() {
             const container = document.getElementById('evacListContainer');
             const evacFilter = document.getElementById('evacFilter');
@@ -1046,6 +1204,7 @@
                     <div class="bg-white rounded-xl shadow-sm border ${isChecked ? 'border-emerald-500 bg-emerald-50/20' : 'border-gray-200'} p-3.5 space-y-2 transition">
                         <div class="flex items-start justify-between">
                             <div>
+                                <span class="text-[10px] font-bold bg-slate-800 text-white px-2 py-0.5 rounded mr-1">${item.floor}</span>
                                 <span class="text-[10px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded mr-1">${item.dept}</span>
                                 <span class="text-xs font-extrabold text-blue-700">${item.name}</span>
                                 <h4 class="text-xs font-bold text-gray-900 mt-1 whitespace-pre-line">${item.task}</h4>
@@ -1089,10 +1248,12 @@
                 document.getElementById('remarkInput').value = evacRemarksState[id] || "";
                 document.getElementById('remarkModal').classList.remove('hidden');
             } else {
+                // 체크 해제 시 즉시 미완료 반영 & 자동 전송
                 evacChecklistState[id] = false;
                 delete evacRemarksState[id];
                 saveChecklistState();
                 renderEvacTable();
+                syncSingleZoneToGoogleSheets(id, false, '-');
             }
         }
 
@@ -1100,11 +1261,13 @@
             if (!currentActiveZoneId) return;
 
             evacChecklistState[currentActiveZoneId] = true;
+            let currentRemark = '특이사항 없음';
             
             if (isSave) {
                 const text = document.getElementById('remarkInput').value.trim();
                 if (text) {
                     evacRemarksState[currentActiveZoneId] = text;
+                    currentRemark = text;
                 } else {
                     delete evacRemarksState[currentActiveZoneId];
                 }
@@ -1112,9 +1275,13 @@
                 delete evacRemarksState[currentActiveZoneId];
             }
 
+            const zoneId = currentActiveZoneId;
             saveChecklistState();
             closeRemarkModal(false);
             renderEvacTable();
+            
+            // 구글 시트로 해당 구역 '대피완료' 자동 전송!
+            syncSingleZoneToGoogleSheets(zoneId, true, currentRemark);
         }
 
         function closeRemarkModal(resetUnchecked = true) {
@@ -1133,6 +1300,7 @@
 
             document.getElementById('completedCount').innerText = completed;
             document.getElementById('totalCount').innerText = total;
+            document.getElementById('progressPercentText').innerText = `(${percentage}%)`;
             document.getElementById('evacuationProgressBar').style.width = `${percentage}%`;
         }
 
@@ -1151,11 +1319,197 @@
             closeResetModal();
             renderEvacTable();
             showToast('체크리스트가 초기화되었습니다.');
+            forceManualSync();
         }
 
-        // TAB 4: Render Manuals (비상방송 외부 문서 링크 추가 지원)
+        function renderDashboard() {
+            const total = EVAC_DATA.length;
+            const completed = Object.values(evacChecklistState).filter(Boolean).length;
+            const remaining = total - completed;
+            const remarksCount = Object.keys(evacRemarksState).filter(k => evacChecklistState[k] && evacRemarksState[k]).length;
+            const percentage = Math.round((completed / total) * 100);
+
+            // KPI 업데이트
+            document.getElementById('dashKpiPercent').innerText = `${percentage}%`;
+            document.getElementById('dashKpiCompleted').innerHTML = `${completed} <span class="text-sm font-semibold text-gray-500">/ ${total}</span>`;
+            document.getElementById('dashKpiRemaining').innerText = remaining;
+            document.getElementById('dashKpiRemarks').innerText = remarksCount;
+            document.getElementById('dashProgressLabel').innerText = `${completed} / ${total} 구역 대피완료 (${percentage}%)`;
+            document.getElementById('dashMainProgressBar').style.width = `${percentage}%`;
+
+            // 10개 구역 카드 그리드 렌더링
+            const gridContainer = document.getElementById('dashboardGridContainer');
+            if (gridContainer) {
+                gridContainer.innerHTML = EVAC_DATA.map(item => {
+                    const isDone = !!evacChecklistState[item.id];
+                    const remark = evacRemarksState[item.id] || "";
+                    const hasRemark = isDone && remark && remark !== '특이사항 없음';
+
+                    return `
+                        <div class="p-3 rounded-xl border ${isDone ? 'bg-emerald-50/70 border-emerald-300' : 'bg-red-50/50 border-red-200'} transition shadow-sm flex flex-col justify-between">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <div class="flex items-center gap-1.5 mb-1">
+                                        <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-white">${item.floor}</span>
+                                        <span class="text-[10px] font-bold text-slate-700">${item.dept}</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-gray-900">${item.task.replace('ㅇ ', '')}</h4>
+                                </div>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold shrink-0 ${isDone ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white animate-pulse'}">
+                                    ${isDone ? '대피 완료' : '수색 중'}
+                                </span>
+                            </div>
+
+                            ${hasRemark ? `
+                                <div class="mt-2 bg-amber-100/80 border border-amber-300 text-amber-900 p-1.5 rounded text-[11px] font-medium flex items-start gap-1">
+                                    <i class="fa-solid fa-triangle-exclamation text-amber-600 mt-0.5 text-xs"></i>
+                                    <span class="leading-tight font-bold">${remark}</span>
+                                </div>
+                            ` : ''}
+
+                            <div class="mt-2 pt-2 border-t border-gray-200/60 text-[10px] text-gray-500 flex justify-between items-center">
+                                <span>담당: ${item.name}</span>
+                                <span class="font-medium text-slate-600">${isDone ? '동기화 완료' : '확인 필요'}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // 실시간 특이사항 피드
+            const feedContainer = document.getElementById('dashboardRemarksFeed');
+            if (feedContainer) {
+                const remarksList = EVAC_DATA.filter(item => evacChecklistState[item.id] && evacRemarksState[item.id]);
+                if (remarksList.length === 0) {
+                    feedContainer.innerHTML = `
+                        <div class="text-center py-6 text-gray-400 text-xs bg-slate-50 rounded-lg border border-dashed border-gray-200">
+                            <i class="fa-solid fa-circle-check text-emerald-500 text-lg mb-1 block"></i>
+                            보고된 잔류자나 특이사항이 없습니다. 모든 구역이 안전합니다.
+                        </div>
+                    `;
+                } else {
+                    feedContainer.innerHTML = remarksList.map(item => `
+                        <div class="bg-amber-50 border-l-4 border-amber-500 p-2.5 rounded-r-lg text-xs text-amber-900 flex justify-between items-start">
+                            <div>
+                                <span class="font-bold text-amber-800">[${item.floor} / ${item.dept}]</span>
+                                <p class="font-medium mt-0.5">${evacRemarksState[item.id]}</p>
+                            </div>
+                            <span class="text-[10px] text-amber-700 bg-amber-100 px-2 py-0.5 rounded font-bold">확인필요</span>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            // 마지막 갱신 시각 표시
+            const timeEl = document.getElementById('dashboardLastUpdate');
+            if (timeEl) {
+                timeEl.innerText = lastSyncTimestamp ? `최근 전송: ${lastSyncTimestamp}` : '로컬 상태 실시간 반영';
+            }
+        }
+
+        // 단일 구역 체크 즉시 구글 시트로 백그라운드 자동 전송!
+        async function syncSingleZoneToGoogleSheets(zoneId, isDone, remark) {
+            const scriptUrl = localStorage.getItem('APPS_SCRIPT_URL') || DEFAULT_SCRIPT_URL;
+            const target = EVAC_DATA.find(d => d.id === zoneId);
+            if (!target) return;
+
+            const nowTime = new Date().toLocaleTimeString('ko-KR');
+            lastSyncTimestamp = nowTime;
+
+            const miniBadge = document.getElementById('autoSyncMiniIndicator');
+            const mainBadge = document.getElementById('syncStatusBadge');
+            
+            if (miniBadge) miniBadge.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-amber-500"></i> 자동 전송 중...`;
+            if (mainBadge) mainBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-up text-[9px]"></i> 전송 중`;
+
+            const payload = {
+                timestamp: new Date().toLocaleString('ko-KR'),
+                singleUpdate: {
+                    id: target.id,
+                    floor: target.floor,
+                    dept: target.dept,
+                    name: target.name,
+                    area: target.area.replace(/\n/g, ' '),
+                    status: isDone ? '완료' : '미완료',
+                    remark: remark || '이상 없음'
+                },
+                totalCompleted: Object.values(evacChecklistState).filter(Boolean).length,
+                totalCount: EVAC_DATA.length
+            };
+
+            try {
+                await fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                showToast(`[${target.floor}] ${target.dept} 대피현황이 구글시트로 자동 전송되었습니다.`);
+                if (miniBadge) miniBadge.innerHTML = `<i class="fa-solid fa-circle text-[8px] text-emerald-500"></i> 자동 동기화됨 (${nowTime})`;
+                if (mainBadge) mainBadge.innerHTML = `<i class="fa-solid fa-cloud-check text-[9px]"></i> 자동연동`;
+                renderDashboard();
+            } catch (err) {
+                console.warn('Google Sheets sync error:', err);
+                if (miniBadge) miniBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-500"></i> 로컬저장 완료`;
+                if (mainBadge) mainBadge.innerHTML = `<i class="fa-solid fa-cloud text-[9px]"></i> 로컬모드`;
+                showToast(`로컬 저장 완료 (구글 시트 연동 대기)`);
+            }
+        }
+
+        // 전체 강제 동기화 (버튼 클릭 시)
+        async function forceManualSync() {
+            const scriptUrl = localStorage.getItem('APPS_SCRIPT_URL') || DEFAULT_SCRIPT_URL;
+
+            const payload = {
+                timestamp: new Date().toLocaleString('ko-KR'),
+                completedCount: Object.values(evacChecklistState).filter(Boolean).length,
+                totalCount: EVAC_DATA.length,
+                checklist: EVAC_DATA.map(item => ({
+                    id: item.id,
+                    floor: item.floor,
+                    dept: item.dept,
+                    name: item.name,
+                    area: item.area.replace(/\n/g, ' '),
+                    status: evacChecklistState[item.id] ? '완료' : '미완료',
+                    remark: evacChecklistState[item.id] ? (evacRemarksState[item.id] || '특이사항 없음') : '-'
+                }))
+            };
+
+            showToast('전체 대피 현황을 구글 시트로 전송 중...');
+
+            try {
+                await fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                lastSyncTimestamp = new Date().toLocaleTimeString('ko-KR');
+                renderDashboard();
+                showToast('구글 시트 전체 동기화가 성공적으로 완료되었습니다!');
+            } catch (err) {
+                console.error(err);
+                showToast('전송 중 오류가 발생했습니다. 네트워크 상태를 확인하세요.', true);
+            }
+        }
+
+        // 대시보드 새로고침 버튼
+        function refreshDashboardData(showIndicator = false) {
+            const icon = document.getElementById('dashRefreshIcon');
+            if (icon) icon.classList.add('fa-spin');
+            
+            setTimeout(() => {
+                renderDashboard();
+                if (icon) icon.classList.remove('fa-spin');
+                if (showIndicator) showToast('대시보드 화면이 최신 상태로 갱신되었습니다.');
+            }, 500);
+        }
+
         function renderManuals() {
             const container = document.getElementById('manualContainer');
+            if (!container) return;
+
             container.innerHTML = MANUAL_DATA.map((item, idx) => `
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     <button onclick="toggleManualAccordion(${idx})" class="w-full p-3.5 text-left flex items-center justify-between hover:bg-gray-50 transition">
@@ -1225,7 +1579,7 @@
             icon.classList.toggle('rotate-180');
         }
 
-        /* ==================== GOOGLE SHEETS APPS SCRIPT SYNC ==================== */
+        // Settings Modal handlers
         function openSettingsModal() {
             const savedUrl = localStorage.getItem('APPS_SCRIPT_URL') || DEFAULT_SCRIPT_URL;
             document.getElementById('scriptUrlInput').value = savedUrl;
@@ -1243,40 +1597,14 @@
             showToast('구글 시트 연동 URL이 저장되었습니다.');
         }
 
-        async function submitEvacuationStatus() {
-            const scriptUrl = localStorage.getItem('APPS_SCRIPT_URL') || DEFAULT_SCRIPT_URL;
-
-            const payload = {
-                timestamp: new Date().toLocaleString('ko-KR'),
-                completedCount: Object.values(evacChecklistState).filter(Boolean).length,
-                totalCount: EVAC_DATA.length,
-                checklist: EVAC_DATA.map(item => ({
-                    id: item.id,
-                    dept: item.dept,
-                    name: item.name,
-                    area: item.area,
-                    status: evacChecklistState[item.id] ? '완료' : '미완료',
-                    remark: evacChecklistState[item.id] ? (evacRemarksState[item.id] || '없음') : '-'
-                }))
-            };
-
-            showToast('구글 시트로 데이터를 전송 중...');
-
-            try {
-                await fetch(scriptUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                showToast('구글 시트로 전송 요청이 완료되었습니다!');
-            } catch (err) {
-                console.error(err);
-                showToast('전송 중 오류가 발생했습니다.', true);
-            }
+        function copyAppsScriptCode() {
+            const textarea = document.getElementById('appsScriptTemplate');
+            textarea.select();
+            document.execCommand('copy');
+            showToast('Apps Script 코드가 클립보드에 복사되었습니다!');
         }
 
-        /* ==================== UTILS ==================== */
+        // Toast utility
         function showToast(msg, isError = false) {
             const toast = document.getElementById('toast');
             const icon = document.getElementById('toastIcon');
@@ -1295,12 +1623,12 @@
             }, 3000);
         }
 
-        // Application Initialization
         window.onload = function() {
             loadChecklistState();
             renderMyRoleCard();
             renderIncidentAccordion();
             renderEvacTable();
+            renderDashboard();
             renderManuals();
         };
     </script>
