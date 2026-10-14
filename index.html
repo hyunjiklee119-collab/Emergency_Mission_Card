@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>비상대응조직 임무카드 & 피난유도 관제 시스템</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,7 +15,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Pretendard', 'sans-serif'],
+                        sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
                     },
                     colors: {
                         emergency: {
@@ -40,6 +40,11 @@
             font-family: 'Pretendard', sans-serif;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            word-break: keep-all; /* 모바일에서 한글 단어 단위 개행으로 글자 밀림 방지 */
+            overflow-wrap: break-word;
+        }
+        .keep-all {
+            word-break: keep-all;
         }
         .hide-scrollbar::-webkit-scrollbar {
             display: none;
@@ -49,7 +54,7 @@
             scrollbar-width: none;
         }
         .active-ring:active {
-            transform: scale(0.98);
+            transform: scale(0.97);
         }
         @keyframes pulse-subtle {
             0%, 100% { opacity: 1; transform: scale(1); }
@@ -58,84 +63,88 @@
         .animate-live-badge {
             animation: pulse-subtle 2s infinite ease-in-out;
         }
+        /* iOS Safe Area 대응 */
+        .safe-bottom {
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
     </style>
 </head>
-<body class="bg-slate-100 text-gray-800 pb-20 select-none antialiased">
+<body class="bg-slate-100 text-gray-800 pb-24 select-none antialiased">
 
     <!-- Top Header -->
-    <header class="sticky top-0 z-40 bg-navy-900 text-white shadow-lg border-b border-red-600/30">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-2.5">
-                <div class="w-9 h-9 rounded-full bg-red-600 flex items-center justify-center animate-pulse shadow-md">
-                    <i class="fa-solid fa-fire-extinguisher text-white text-base"></i>
+    <header class="sticky top-0 z-40 bg-navy-900 text-white shadow-md border-b border-red-600/30">
+        <div class="max-w-4xl mx-auto px-3.5 py-2.5 flex items-center justify-between">
+            <div class="flex items-center space-x-2.5 min-w-0">
+                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-red-600 flex items-center justify-center shrink-0 animate-pulse shadow">
+                    <i class="fa-solid fa-fire-extinguisher text-white text-sm sm:text-base"></i>
                 </div>
-                <div>
-                    <h1 class="font-bold text-base sm:text-lg tracking-tight leading-tight flex items-center gap-1.5">
-                        비상대응조직 임무카드
-                        <span id="syncStatusBadge" class="text-[10px] font-semibold bg-emerald-600/90 text-white px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                            <i class="fa-solid fa-cloud-check text-[9px]"></i> 자동연동
+                <div class="truncate">
+                    <h1 class="font-extrabold text-sm sm:text-base tracking-tight leading-snug flex items-center gap-1.5 truncate">
+                        <span>비상대응조직 임무카드</span>
+                        <span id="syncStatusBadge" class="text-[9px] sm:text-[10px] font-semibold bg-emerald-600/90 text-white px-1.5 py-0.5 rounded inline-flex items-center gap-0.5 shrink-0">
+                            <i class="fa-solid fa-cloud-check text-[8px]"></i> 자동연동
                         </span>
                     </h1>
-                    <p class="text-[10px] sm:text-xs text-gray-400">원익홀딩스 화재대응 & 실시간 피난유도 관제</p>
+                    <p class="text-[10px] sm:text-xs text-gray-400 truncate">원익홀딩스 화재대응 & 실시간 피난유도 관제</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-2">
-                <button onclick="openSettingsModal()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-gray-300 transition" title="구글시트 연동 및 가이드">
-                    <i class="fa-solid fa-gear text-sm"></i>
+            <div class="flex items-center space-x-1.5 shrink-0">
+                <button onclick="openSettingsModal()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-gray-300 transition active-ring" title="구글시트 연동 및 앱스스크립트 가이드">
+                    <i class="fa-solid fa-gear text-xs sm:text-sm"></i>
                 </button>
-                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-red-800/80 text-red-100 border border-red-500 shadow-sm">
+                <span class="inline-flex items-center px-2 py-1 rounded text-[10px] sm:text-xs font-bold bg-red-800/80 text-red-100 border border-red-500 shadow-sm">
                     비상단계
                 </span>
             </div>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-3.5 sm:px-5 pt-3.5">
+    <main class="max-w-4xl mx-auto px-3 sm:px-5 pt-3">
 
         <!-- ==================== TAB 1: 내 임무 ==================== -->
-        <section id="tab-1" class="tab-content space-y-4">
+        <section id="tab-1" class="tab-content space-y-3.5">
             
-            <!-- ① 화재 시 공통 대응 절차 -->
-            <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
-                <h2 class="text-sm font-bold text-gray-900 mb-3 flex items-center">
-                    <i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i>
+            <!-- ① 화재 시 공통 대응 절차 (모바일 4분할 가로 스크롤 붕괴 방지) -->
+            <div class="bg-white rounded-xl shadow-sm p-3.5 sm:p-4 border border-gray-200">
+                <h2 class="text-xs sm:text-sm font-bold text-gray-900 mb-2.5 flex items-center">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1.5 sm:mr-2"></i>
                     화재 시 공통 대응 절차 (4대 수칙)
                 </h2>
-                <div class="grid grid-cols-4 gap-2 text-center">
-                    <div class="bg-red-50 p-2.5 rounded-lg border border-red-100">
-                        <div class="w-8 h-8 rounded-full bg-red-500 text-white font-black text-xs flex items-center justify-center mx-auto mb-1 shadow-sm">1</div>
-                        <div class="font-bold text-xs text-red-700">알린다</div>
-                        <div class="text-[10px] text-gray-500 mt-0.5">불이야! 외침</div>
+                <div class="grid grid-cols-4 gap-1.5 sm:gap-2 text-center">
+                    <div class="bg-red-50 p-2 sm:p-2.5 rounded-lg border border-red-100 flex flex-col justify-between">
+                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-red-500 text-white font-black text-[11px] sm:text-xs flex items-center justify-center mx-auto mb-1 shadow-xs">1</div>
+                        <div class="font-bold text-[11px] sm:text-xs text-red-700">알린다</div>
+                        <div class="text-[9px] sm:text-[10px] text-gray-500 mt-0.5 leading-tight">불이야! 외침</div>
                     </div>
-                    <div class="bg-orange-50 p-2.5 rounded-lg border border-orange-100">
-                        <div class="w-8 h-8 rounded-full bg-orange-500 text-white font-black text-xs flex items-center justify-center mx-auto mb-1 shadow-sm">2</div>
-                        <div class="font-bold text-xs text-orange-700">누른다</div>
-                        <div class="text-[10px] text-gray-500 mt-0.5">발신기 눌러전파</div>
+                    <div class="bg-orange-50 p-2 sm:p-2.5 rounded-lg border border-orange-100 flex flex-col justify-between">
+                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-orange-500 text-white font-black text-[11px] sm:text-xs flex items-center justify-center mx-auto mb-1 shadow-xs">2</div>
+                        <div class="font-bold text-[11px] sm:text-xs text-orange-700">누른다</div>
+                        <div class="text-[9px] sm:text-[10px] text-gray-500 mt-0.5 leading-tight">발신기 전파</div>
                     </div>
-                    <div class="bg-yellow-50 p-2.5 rounded-lg border border-yellow-200">
-                        <div class="w-8 h-8 rounded-full bg-yellow-600 text-white font-black text-xs flex items-center justify-center mx-auto mb-1 shadow-sm">3</div>
-                        <div class="font-bold text-xs text-yellow-800">끈다</div>
-                        <div class="text-[10px] text-gray-500 mt-0.5">초기소화(가능시)</div>
+                    <div class="bg-yellow-50 p-2 sm:p-2.5 rounded-lg border border-yellow-200 flex flex-col justify-between">
+                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-yellow-600 text-white font-black text-[11px] sm:text-xs flex items-center justify-center mx-auto mb-1 shadow-xs">3</div>
+                        <div class="font-bold text-[11px] sm:text-xs text-yellow-800">끈다</div>
+                        <div class="text-[9px] sm:text-[10px] text-gray-500 mt-0.5 leading-tight">초기소화(가능시)</div>
                     </div>
-                    <div class="bg-emerald-50 p-2.5 rounded-lg border border-emerald-100">
-                        <div class="w-8 h-8 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center mx-auto mb-1 shadow-sm">4</div>
-                        <div class="font-bold text-xs text-emerald-800">피한다</div>
-                        <div class="text-[10px] text-gray-500 mt-0.5">신속 대피</div>
+                    <div class="bg-emerald-50 p-2 sm:p-2.5 rounded-lg border border-emerald-100 flex flex-col justify-between">
+                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-emerald-600 text-white font-black text-[11px] sm:text-xs flex items-center justify-center mx-auto mb-1 shadow-xs">4</div>
+                        <div class="font-bold text-[11px] sm:text-xs text-emerald-800">피한다</div>
+                        <div class="text-[9px] sm:text-[10px] text-gray-500 mt-0.5 leading-tight">신속 대피</div>
                     </div>
                 </div>
             </div>
 
             <!-- ② 내 임무 카드 선택/확인 -->
-            <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
-                <div class="flex items-center justify-between mb-3">
-                    <h2 class="text-sm font-bold text-gray-900 flex items-center">
-                        <i class="fa-solid fa-id-card text-blue-600 mr-2"></i>
+            <div class="bg-white rounded-xl shadow-sm p-3.5 sm:p-4 border border-gray-200">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-xs sm:text-sm font-bold text-gray-900 flex items-center">
+                        <i class="fa-solid fa-id-card text-blue-600 mr-1.5 sm:mr-2"></i>
                         나의 임무 카드 선택
                     </h2>
-                    <span class="text-xs text-gray-500">본인 역할 지정</span>
+                    <span class="text-[10px] sm:text-xs text-gray-500">본인 역할 지정</span>
                 </div>
                 
-                <select id="myRoleSelect" onchange="renderMyRoleCard()" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 font-medium">
+                <select id="myRoleSelect" onchange="renderMyRoleCard()" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-xs sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 font-medium">
                     <option value="" selected>[공통] 화재 시 전사원 공통 대응 임무</option>
                     <option value="지휘부">지휘부 (대표이사 / 소방대장)</option>
                     <option value="지휘통제반">지휘통제반 (안전환경팀)</option>
@@ -145,30 +154,30 @@
                 </select>
 
                 <!-- Dynamic Render Card -->
-                <div id="myRoleCardDisplay" class="mt-4">
+                <div id="myRoleCardDisplay" class="mt-3">
                     <!-- Dynamic role content -->
                 </div>
             </div>
 
             <!-- ③ 비상집결지 안내 -->
-            <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
-                <h2 class="text-sm font-bold text-gray-900 mb-3 flex items-center">
-                    <i class="fa-solid fa-location-dot text-red-600 mr-2"></i>
+            <div class="bg-white rounded-xl shadow-sm p-3.5 sm:p-4 border border-gray-200">
+                <h2 class="text-xs sm:text-sm font-bold text-gray-900 mb-2.5 flex items-center">
+                    <i class="fa-solid fa-location-dot text-red-600 mr-1.5 sm:mr-2"></i>
                     비상 집결지 위치
                 </h2>
-                <div class="space-y-2.5">
-                    <div class="flex items-start space-x-3 p-3 bg-red-50 rounded-lg border border-red-100">
-                        <div class="w-7 h-7 rounded-full bg-red-600 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">1차</div>
-                        <div>
-                            <span class="font-bold text-xs text-red-900 block">1차 집결지</span>
-                            <p class="text-xs text-red-700 font-medium mt-0.5">진위 본사 후문 앞 공터</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div class="flex items-center space-x-2.5 p-2.5 bg-red-50 rounded-lg border border-red-100">
+                        <div class="w-6 h-6 rounded-full bg-red-600 text-white font-bold text-xs flex items-center justify-center shrink-0">1차</div>
+                        <div class="min-w-0">
+                            <span class="font-bold text-[11px] text-red-900 block">1차 집결지</span>
+                            <p class="text-xs text-red-700 font-medium truncate">진위 본사 후문 앞 공터</p>
                         </div>
                     </div>
-                    <div class="flex items-start space-x-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
-                        <div class="w-7 h-7 rounded-full bg-slate-700 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">2차</div>
-                        <div>
-                            <span class="font-bold text-xs text-slate-800 block">2차 집결지</span>
-                            <p class="text-xs text-slate-600 font-medium mt-0.5">진위 3산단 원익IPS 비상집결지</p>
+                    <div class="flex items-center space-x-2.5 p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                        <div class="w-6 h-6 rounded-full bg-slate-700 text-white font-bold text-xs flex items-center justify-center shrink-0">2차</div>
+                        <div class="min-w-0">
+                            <span class="font-bold text-[11px] text-slate-800 block">2차 집결지</span>
+                            <p class="text-xs text-slate-600 font-medium truncate">진위 3산단 원익IPS 비상집결지</p>
                         </div>
                     </div>
                 </div>
@@ -178,92 +187,86 @@
 
         <!-- ==================== TAB 2: 사고 유형별 대응 ==================== -->
         <section id="tab-2" class="tab-content hidden space-y-3">
-            <div class="bg-navy-900 text-white p-3.5 rounded-xl shadow border border-slate-700">
-                <h2 class="font-bold text-sm flex items-center">
+            <div class="bg-navy-900 text-white p-3 rounded-xl shadow border border-slate-700">
+                <h2 class="font-bold text-xs sm:text-sm flex items-center">
                     <i class="fa-solid fa-shield-halved text-red-500 mr-2"></i>
                     사고 유형별 비상대응 절차 & 발령 기준
                 </h2>
-                <p class="text-xs text-gray-300 mt-1">재난 유형별 초기 조치 및 행동수칙을 빠르게 확인하세요.</p>
+                <p class="text-[11px] sm:text-xs text-gray-300 mt-0.5">재난 유형별 초기 조치 및 행동수칙을 빠르게 확인하세요.</p>
             </div>
 
             <!-- 비상단계 발령 기준 카드 -->
-            <div class="bg-white rounded-xl shadow-sm p-3.5 border border-gray-200 space-y-2">
+            <div class="bg-white rounded-xl shadow-sm p-3 border border-gray-200 space-y-2">
                 <h3 class="text-xs font-bold text-gray-900 flex items-center">
                     <i class="fa-solid fa-gauge-high text-amber-500 mr-1.5"></i>
                     비상단계별 가동 기준 (3단계)
                 </h3>
-                <div class="grid grid-cols-3 gap-1.5 text-center text-[11px]">
-                    <div class="bg-amber-50 border border-amber-200 p-2 rounded-lg">
-                        <span class="font-bold text-amber-800 block mb-0.5">1단계 (주의)</span>
-                        <p class="text-[10px] text-amber-900 leading-tight">소형 화재, 국소 누출<br>(초동대응반 조치)</p>
+                <div class="grid grid-cols-3 gap-1.5 text-center">
+                    <div class="bg-amber-50 border border-amber-200 p-2 rounded-lg flex flex-col justify-between">
+                        <span class="font-extrabold text-amber-800 text-[11px] block mb-0.5">1단계(주의)</span>
+                        <p class="text-[9.5px] sm:text-[10px] text-amber-900 leading-tight">소형화재·국소누출<br>(초동대응반)</p>
                     </div>
-                    <div class="bg-orange-50 border border-orange-200 p-2 rounded-lg">
-                        <span class="font-bold text-orange-800 block mb-0.5">2단계 (경계)</span>
-                        <p class="text-[10px] text-orange-900 leading-tight">확산 우려, 건물 대피<br>(비상대응조직 가동)</p>
+                    <div class="bg-orange-50 border border-orange-200 p-2 rounded-lg flex flex-col justify-between">
+                        <span class="font-extrabold text-orange-800 text-[11px] block mb-0.5">2단계(경계)</span>
+                        <p class="text-[9.5px] sm:text-[10px] text-orange-900 leading-tight">확산우려·건물대피<br>(비상조직가동)</p>
                     </div>
-                    <div class="bg-red-50 border border-red-200 p-2 rounded-lg">
-                        <span class="font-bold text-red-800 block mb-0.5">3단계 (심각)</span>
-                        <p class="text-[10px] text-red-900 leading-tight">인명피해, 광역 대피<br>(소방/지자체 합동)</p>
+                    <div class="bg-red-50 border border-red-200 p-2 rounded-lg flex flex-col justify-between">
+                        <span class="font-extrabold text-red-800 text-[11px] block mb-0.5">3단계(심각)</span>
+                        <p class="text-[9.5px] sm:text-[10px] text-red-900 leading-tight">인명피해·광역대피<br>(소방합동대응)</p>
                     </div>
                 </div>
             </div>
 
             <!-- 사고 유형별 행동요령 아코디언 -->
-            <div id="incidentAccordionContainer" class="space-y-2.5">
+            <div id="incidentAccordionContainer" class="space-y-2">
                 <!-- JavaScript generated accordion items -->
             </div>
         </section>
 
         <!-- ==================== TAB 3: 피난유도 (현장 요원용) ==================== -->
-        <section id="tab-3" class="tab-content hidden space-y-4">
+        <section id="tab-3" class="tab-content hidden space-y-3.5">
             
             <!-- ① 피난유도반 공통 임무 & 자동 전송 안내 배너 -->
-            <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-3.5 shadow-sm">
-                <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center">
+            <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-3 shadow-sm">
+                <div class="flex items-center justify-between mb-1.5 flex-wrap gap-1">
+                    <h2 class="text-xs font-bold text-amber-900 uppercase tracking-tight flex items-center">
                         <i class="fa-solid fa-bullhorn mr-1.5 text-amber-600"></i>
                         피난유도반 현장 행동 수칙
                     </h2>
-                    <span class="text-[10px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded shadow-sm flex items-center gap-1">
-                        <i class="fa-solid fa-bolt"></i> 완료 체크 시 구글시트 즉시 자동 전송
+                    <span class="text-[9.5px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded shadow-xs flex items-center gap-1">
+                        <i class="fa-solid fa-bolt"></i> 체크 즉시 구글시트 자동저장
                     </span>
                 </div>
-                <ul class="text-xs text-amber-900 space-y-1 font-medium pl-1">
-                    <li class="flex items-start">
-                        <span class="text-amber-600 font-bold mr-1.5">•</span>
-                        <span><strong>원터치 자동보고:</strong> 대피완료 체크 시 지휘본부 관제 대시보드 및 구글 시트로 실시간 반영됩니다.</span>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-amber-600 font-bold mr-1.5">•</span>
-                        <span><strong>잔류자 발생 시:</strong> 체크 시 뜨는 팝업에 잔류 인원 및 위치를 즉시 기록해 주세요.</span>
-                    </li>
-                </ul>
+                <p class="text-[11px] text-amber-900 leading-relaxed">
+                    구역 수색 후 <strong>[대피완료]</strong> 체크 시 상황실 관제 모니터와 구글 시트로 즉시 전송됩니다. 미대피자 또는 이상 발생 시 팝업에 내용을 입력해 주세요.
+                </p>
             </div>
 
             <!-- Realtime Status Summary & Filter -->
-            <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-200 space-y-3">
-                <div class="flex items-center justify-between mb-1">
-                    <div class="flex items-center gap-2">
-                        <h3 class="text-sm font-bold text-gray-800">구역별 수색 & 대피 현황</h3>
-                        <span id="autoSyncMiniIndicator" class="text-[11px] text-gray-500 flex items-center gap-1">
-                            <i class="fa-solid fa-circle text-[8px] text-emerald-500"></i> 준비됨
+            <div class="bg-white rounded-xl shadow-sm p-3.5 border border-gray-200 space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <h3 class="text-xs sm:text-sm font-bold text-gray-800 truncate">구역별 수색 & 대피 현황</h3>
+                        <span id="autoSyncMiniIndicator" class="text-[10px] text-gray-500 shrink-0 flex items-center gap-1">
+                            <i class="fa-solid fa-circle text-[7px] text-emerald-500"></i> 실시간 연동
                         </span>
                     </div>
-                    <div class="text-xs font-bold">
-                        <span id="completedCount" class="text-emerald-600 font-extrabold text-sm">0</span> / <span id="totalCount" class="text-gray-600">10</span> 구역 완료
-                        <span id="progressPercentText" class="text-blue-600 ml-1">(0%)</span>
+                    <div class="text-xs font-bold shrink-0">
+                        <span id="completedCount" class="text-emerald-600 font-black text-sm sm:text-base">0</span> / <span id="totalCount" class="text-gray-600">10</span> 구역
+                        <span id="progressPercentText" class="text-blue-600 ml-0.5 text-xs">(0%)</span>
                     </div>
                 </div>
+
                 <!-- Progress Bar -->
-                <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
-                    <div id="evacuationProgressBar" class="bg-emerald-500 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden shadow-inner">
+                    <div id="evacuationProgressBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
                 
                 <!-- Filter Dropdown & Quick Actions -->
-                <div class="pt-1 flex flex-col sm:flex-row gap-2">
-                    <select id="evacFilter" onchange="renderEvacTable()" class="flex-1 bg-white border border-gray-300 text-xs rounded-lg p-2.5 font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
+                <div class="pt-0.5 flex flex-col sm:flex-row gap-1.5">
+                    <select id="evacFilter" onchange="renderEvacTable()" class="flex-1 bg-white border border-gray-300 text-xs rounded-lg p-2 font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-xs truncate">
                         <option value="">전체 구역 보기 (10개 구역 전체)</option>
-                        <option value="EVAC_01">ㅇ 집결지 통제 : SKH영업팀 / 글로벌영업팀</option>
+                        <option value="EVAC_01">ㅇ 집결지 통제 : 영업팀 / 글로벌영업팀</option>
                         <option value="EVAC_02">ㅇ 지하층 피난유도 : 연구소</option>
                         <option value="EVAC_03">ㅇ 1층#1 & 2층#1 피난유도 : 구매팀</option>
                         <option value="EVAC_04">ㅇ 1층#2 피난유도 : 품질G</option>
@@ -275,22 +278,22 @@
                         <option value="EVAC_10">ㅇ 4층 피난유도 : People팀 / Culture팀</option>
                     </select>
 
-                    <button onclick="switchTab(4)" class="bg-navy-900 hover:bg-slate-800 text-white font-bold px-3 py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 shrink-0 shadow transition">
-                        <i class="fa-solid fa-chart-line text-amber-400"></i> 상황실 대시보드 보기
+                    <button onclick="switchTab(4)" class="bg-navy-900 hover:bg-slate-800 text-white font-bold px-3 py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 shrink-0 shadow-xs transition active-ring">
+                        <i class="fa-solid fa-chart-line text-amber-400"></i> 상황실 대시보드
                     </button>
                 </div>
             </div>
 
             <!-- ② 각 구역 별 피난유도 체크리스트 카드 List -->
-            <div id="evacListContainer" class="space-y-3">
+            <div id="evacListContainer" class="space-y-2.5">
                 <!-- Dynamic Checklist Card items -->
             </div>
 
-            <div class="pt-2 flex gap-2">
-                <button onclick="forceManualSync()" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-lg text-xs hover:bg-blue-700 transition flex items-center justify-center shadow">
-                    <i class="fa-solid fa-rotate mr-2"></i> 구글 시트 전체 강제 동기화
+            <div class="pt-1 flex gap-2">
+                <button onclick="forceManualSync()" class="flex-1 bg-blue-600 text-white font-bold py-2.5 rounded-lg text-xs hover:bg-blue-700 transition flex items-center justify-center shadow-xs active-ring">
+                    <i class="fa-solid fa-rotate mr-1.5"></i> 시트 강제 재전송
                 </button>
-                <button onclick="openResetModal()" class="bg-gray-200 text-gray-700 font-bold px-4 py-2.5 rounded-lg text-xs hover:bg-gray-300 transition shrink-0">
+                <button onclick="openResetModal()" class="bg-gray-200 text-gray-700 font-bold px-3.5 py-2.5 rounded-lg text-xs hover:bg-gray-300 transition shrink-0 active-ring">
                     초기화
                 </button>
             </div>
@@ -298,278 +301,236 @@
         </section>
 
         <!-- ==================== TAB 4: 상황관제 대시보드 (종합상황실) ==================== -->
-        <section id="tab-4" class="tab-content hidden space-y-4">
+        <section id="tab-4" class="tab-content hidden space-y-3.5">
             
             <!-- 대시보드 상단 헤더 & 컨트롤 -->
-            <div class="bg-navy-900 text-white rounded-xl p-4 shadow-lg border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="bg-navy-900 text-white rounded-xl p-3 sm:p-4 shadow border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
-                        <h2 class="text-base font-extrabold tracking-tight">비상상황실 종합 대피관제 모니터</h2>
+                        <h2 class="text-sm sm:text-base font-extrabold tracking-tight">비상상황실 종합 대피관제 모니터</h2>
                     </div>
-                    <p class="text-xs text-gray-300 mt-1">구글 시트 연동 기반 실시간 잔류자 수색 및 피난현황 집계</p>
+                    <p class="text-[11px] sm:text-xs text-gray-300 mt-0.5">구글 시트 연동 기반 실시간 잔류자 수색 및 피난현황 집계</p>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span id="dashboardLastUpdate" class="text-[11px] text-gray-400 bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700">
+                <div class="flex items-center justify-between sm:justify-end gap-2">
+                    <span id="dashboardLastUpdate" class="text-[10px] sm:text-[11px] text-gray-400 bg-slate-800 px-2 py-1 rounded border border-slate-700 truncate">
                         동기화 대기중
                     </span>
-                    <button onclick="refreshDashboardData(true)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition shadow">
-                        <i class="fa-solid fa-arrows-rotate" id="dashRefreshIcon"></i> 새로고침
+                    <button onclick="refreshDashboardData(true)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded-lg text-xs flex items-center gap-1 transition shadow-xs active-ring shrink-0">
+                        <i class="fa-solid fa-arrows-rotate text-[11px]" id="dashRefreshIcon"></i> 새로고침
                     </button>
                 </div>
             </div>
 
-            <!-- 대시보드 핵심 KPI 카드 (4분할) -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm text-center">
-                    <span class="text-xs text-gray-500 font-medium">대피 진행률</span>
-                    <div id="dashKpiPercent" class="text-2xl font-black text-blue-600 mt-1">0%</div>
-                    <div class="text-[10px] text-gray-400 mt-0.5">목표: 100% 완료</div>
+            <!-- 대시보드 핵심 KPI 카드 (모바일 2x2 정돈) -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div class="bg-white p-2.5 sm:p-3 rounded-xl border border-gray-200 shadow-xs text-center">
+                    <span class="text-[11px] text-gray-500 font-medium">대피 진행률</span>
+                    <div id="dashKpiPercent" class="text-xl sm:text-2xl font-black text-blue-600 mt-0.5">0%</div>
+                    <div class="text-[9px] sm:text-[10px] text-gray-400">전체 10개 구역</div>
                 </div>
-                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm text-center">
-                    <span class="text-xs text-gray-500 font-medium">완료 구역</span>
-                    <div id="dashKpiCompleted" class="text-2xl font-black text-emerald-600 mt-1">0 <span class="text-sm font-semibold text-gray-500">/ 10</span></div>
-                    <div class="text-[10px] text-emerald-600 font-bold mt-0.5">안전 확보</div>
+                <div class="bg-white p-2.5 sm:p-3 rounded-xl border border-gray-200 shadow-xs text-center">
+                    <span class="text-[11px] text-gray-500 font-medium">완료 구역</span>
+                    <div id="dashKpiCompleted" class="text-xl sm:text-2xl font-black text-emerald-600 mt-0.5">0 <span class="text-xs font-semibold text-gray-400">/ 10</span></div>
+                    <div class="text-[9px] sm:text-[10px] text-emerald-600 font-bold">안전 확보</div>
                 </div>
-                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm text-center">
-                    <span class="text-xs text-gray-500 font-medium">수색 중 / 잔류</span>
-                    <div id="dashKpiRemaining" class="text-2xl font-black text-red-600 mt-1">10</div>
-                    <div class="text-[10px] text-red-500 font-bold mt-0.5">미확인 구역</div>
+                <div class="bg-white p-2.5 sm:p-3 rounded-xl border border-gray-200 shadow-xs text-center">
+                    <span class="text-[11px] text-gray-500 font-medium">수색 중 / 잔류</span>
+                    <div id="dashKpiRemaining" class="text-xl sm:text-2xl font-black text-red-600 mt-0.5">10</div>
+                    <div class="text-[9px] sm:text-[10px] text-red-500 font-bold">미확인 구역</div>
                 </div>
-                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm text-center">
-                    <span class="text-xs text-gray-500 font-medium">특이사항/잔류자</span>
-                    <div id="dashKpiRemarks" class="text-2xl font-black text-amber-500 mt-1">0</div>
-                    <div class="text-[10px] text-amber-600 font-bold mt-0.5">주의 및 조치요망</div>
+                <div class="bg-white p-2.5 sm:p-3 rounded-xl border border-gray-200 shadow-xs text-center">
+                    <span class="text-[11px] text-gray-500 font-medium">특이사항 보고</span>
+                    <div id="dashKpiRemarks" class="text-xl sm:text-2xl font-black text-amber-500 mt-0.5">0</div>
+                    <div class="text-[9px] sm:text-[10px] text-amber-600 font-bold">주의/구조요청</div>
                 </div>
             </div>
 
             <!-- 대피 현황 종합 바 -->
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-2">
+            <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-xs space-y-1.5">
                 <div class="flex justify-between items-center text-xs font-bold">
                     <span class="text-gray-700">전사 피난완료 게이지</span>
-                    <span id="dashProgressLabel" class="text-emerald-700">0 / 10 구역 완료</span>
+                    <span id="dashProgressLabel" class="text-emerald-700 font-extrabold">0 / 10 구역 완료</span>
                 </div>
-                <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden p-0.5">
+                <div class="w-full bg-slate-200 rounded-full h-3.5 overflow-hidden p-0.5">
                     <div id="dashMainProgressBar" class="bg-gradient-to-r from-emerald-500 to-teal-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
                 </div>
             </div>
 
             <!-- 층별 및 구역별 실시간 그리드 매트릭스 -->
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
-                <div class="flex items-center justify-between border-b pb-2.5">
-                    <h3 class="text-sm font-extrabold text-gray-900 flex items-center gap-1.5">
+            <div class="bg-white p-3 sm:p-4 rounded-xl border border-gray-200 shadow-xs space-y-2.5">
+                <div class="flex items-center justify-between border-b pb-2 flex-wrap gap-1">
+                    <h3 class="text-xs sm:text-sm font-black text-gray-900 flex items-center gap-1.5">
                         <i class="fa-solid fa-layer-group text-blue-600"></i>
                         층별 피난 & 잔류 수색 현황판
                     </h3>
-                    <div class="flex items-center gap-3 text-xs">
-                        <span class="flex items-center gap-1 font-semibold text-emerald-700">
-                            <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> 완료
+                    <div class="flex items-center gap-2.5 text-[10px] sm:text-xs">
+                        <span class="flex items-center gap-1 font-bold text-emerald-700">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> 완료
                         </span>
-                        <span class="flex items-center gap-1 font-semibold text-rose-700">
-                            <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span> 미완료
+                        <span class="flex items-center gap-1 font-bold text-rose-700">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span> 미완료
                         </span>
-                        <span class="flex items-center gap-1 font-semibold text-amber-700">
-                            <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> 특이사항
+                        <span class="flex items-center gap-1 font-bold text-amber-700">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> 특이사항
                         </span>
                     </div>
                 </div>
 
-                <!-- 10개 구역 시각적 카드 매트릭스 -->
-                <div id="dashboardGridContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <!-- 10개 구역 시각적 카드 매트릭스 (모바일 글자 밀림 방지 패딩/폰트) -->
+                <div id="dashboardGridContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <!-- Dynamic Dashboard Grid Items -->
                 </div>
             </div>
 
             <!-- 실시간 특이사항 & 구조요청 피드 -->
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
-                <h3 class="text-sm font-extrabold text-gray-900 flex items-center gap-1.5">
+            <div class="bg-white p-3 sm:p-4 rounded-xl border border-gray-200 shadow-xs space-y-2">
+                <h3 class="text-xs sm:text-sm font-extrabold text-gray-900 flex items-center gap-1.5">
                     <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
                     현장 특이사항 및 잔류자 긴급 피드
                 </h3>
-                <div id="dashboardRemarksFeed" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                <div id="dashboardRemarksFeed" class="space-y-1.5 max-h-56 overflow-y-auto pr-1">
                     <!-- Dynamic Remarks Feed -->
                 </div>
             </div>
 
         </section>
 
-        <!-- ==================== TAB 5: 매뉴얼 (기존 탭4) ==================== -->
+        <!-- ==================== TAB 5: 매뉴얼 ==================== -->
         <section id="tab-5" class="tab-content hidden space-y-3">
             
             <!-- ① 비상연락망 (최상단) -->
-            <div class="bg-white rounded-xl shadow-sm border border-red-200 overflow-hidden">
-                <button onclick="toggleContactAccordion()" class="w-full p-3.5 text-left flex items-center justify-between bg-red-50/80 hover:bg-red-100/80 transition">
+            <div class="bg-white rounded-xl shadow-xs border border-red-200 overflow-hidden">
+                <button onclick="toggleContactAccordion()" class="w-full p-3 text-left flex items-center justify-between bg-red-50/80 hover:bg-red-100/80 transition active-ring">
                     <span class="font-bold text-xs text-red-900 flex items-center">
-                        <i class="fa-solid fa-phone-volume text-red-600 text-sm mr-2.5"></i>
+                        <i class="fa-solid fa-phone-volume text-red-600 text-sm mr-2 shrink-0"></i>
                         비상연락망 및 사고 보고 절차
                     </span>
                     <i id="contact-acc-icon" class="fa-solid fa-chevron-down text-red-400 text-xs transition-transform duration-200 rotate-180"></i>
                 </button>
-                <div id="contact-acc-content" class="p-3.5 space-y-4 text-xs bg-white">
+                <div id="contact-acc-content" class="p-3 space-y-3.5 text-xs bg-white">
                     <!-- 1. 사고 발생 시 보고 절차 및 가동 기준 -->
                     <div class="space-y-2 border-b border-gray-100 pb-3">
                         <h3 class="font-bold text-slate-800 text-xs flex items-center">
-                            <span class="w-4 h-4 rounded-full bg-red-600 text-white text-[10px] flex items-center justify-center mr-1.5 font-bold">1</span>
+                            <span class="w-4 h-4 rounded-full bg-red-600 text-white text-[10px] flex items-center justify-center mr-1.5 font-bold shrink-0">1</span>
                             사고 발생 시 보고 절차 및 가동 기준
                         </h3>
                         
-                        <!-- 보고 절차 -->
-                        <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100 space-y-1.5">
-                            <span class="font-bold text-slate-700 block text-[11px]">■ 보고 절차</span>
+                        <!-- 보고 절차 모바일 대응 -->
+                        <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 space-y-1">
+                            <span class="font-bold text-slate-700 block text-[10.5px]">■ 보고 절차</span>
                             <div class="grid grid-cols-4 gap-1 text-center text-[10px] font-semibold text-slate-700">
-                                <div class="bg-white p-1.5 rounded border border-gray-200">① 초동 조치<br><span class="text-[9px] text-gray-500 font-normal">최초 확인자</span></div>
-                                <div class="bg-white p-1.5 rounded border border-gray-200">② 신고 접수<br><span class="text-[9px] text-gray-500 font-normal">안전/People팀</span></div>
-                                <div class="bg-white p-1.5 rounded border border-gray-200">③ 지휘 통제<br><span class="text-[9px] text-gray-500 font-normal">비상 상황실</span></div>
-                                <div class="bg-white p-1.5 rounded border border-gray-200">④ 최종 보고<br><span class="text-[9px] text-gray-500 font-normal">경영진 보고</span></div>
+                                <div class="bg-white p-1 rounded border border-gray-200 leading-tight">① 초동조치<br><span class="text-[8.5px] text-gray-500">최초발견</span></div>
+                                <div class="bg-white p-1 rounded border border-gray-200 leading-tight">② 신고접수<br><span class="text-[8.5px] text-gray-500">안전/피플</span></div>
+                                <div class="bg-white p-1 rounded border border-gray-200 leading-tight">③ 지휘통제<br><span class="text-[8.5px] text-gray-500">비상상황실</span></div>
+                                <div class="bg-white p-1 rounded border border-gray-200 leading-tight">④ 최종보고<br><span class="text-[8.5px] text-gray-500">경영진</span></div>
                             </div>
                         </div>
 
                         <!-- 주의 사항 -->
-                        <div class="bg-red-50 p-2.5 rounded-lg border border-red-200 text-red-900 text-[11px] flex items-start space-x-2">
-                            <i class="fa-solid fa-circle-exclamation text-red-600 mt-0.5"></i>
+                        <div class="bg-red-50 p-2 rounded-lg border border-red-200 text-red-900 text-[10.5px] flex items-start space-x-1.5">
+                            <i class="fa-solid fa-circle-exclamation text-red-600 mt-0.5 shrink-0"></i>
                             <div>
                                 <span class="font-bold">화학사고 발생 시 15분 이내 즉시 신고 필수</span>
-                                <p class="text-[10px] text-red-700 mt-0.5">※ 화학물질관리법 기준 (미신고 시 법적 처벌)</p>
+                                <p class="text-[9.5px] text-red-700 mt-0.5">화학물질관리법 기준 (미신고 시 법적 처벌)</p>
                             </div>
                         </div>
 
                         <!-- 가동 기준 -->
-                        <div class="bg-amber-50/70 p-2.5 rounded-lg border border-amber-200 text-[11px] space-y-1">
-                            <span class="font-bold text-amber-900 block">■ 가동 기준 (해당 조건 중 1개 이상 발생 시 상황실 즉시 가동)</span>
-                            <ul class="list-disc list-inside text-gray-700 space-y-0.5 text-[10.5px]">
+                        <div class="bg-amber-50/70 p-2 rounded-lg border border-amber-200 text-[10.5px] space-y-0.5">
+                            <span class="font-bold text-amber-900 block">■ 가동 기준 (1개 이상 발생 시 상황실 가동)</span>
+                            <ul class="list-disc list-inside text-gray-700 space-y-0.5 text-[10px]">
                                 <li>업무상 재해 발생 시</li>
                                 <li>초기 진화 실패로 화재 확산 시</li>
-                                <li>정전 발생 시</li>
-                                <li>천재지변에 의한 대규모 피해 시</li>
-                                <li>독성·가연성 가스, 화학물질 누출 확산 시</li>
+                                <li>정전 발생 시 / 대규모 천재지변 피해 시</li>
+                                <li>독성·가연성 가스 및 화학물질 누출 시</li>
                             </ul>
                         </div>
                     </div>
 
                     <!-- 2. 비상 상황실 및 주요 연락처 -->
-                    <div class="space-y-2 border-b border-gray-100 pb-3">
+                    <div class="space-y-1.5 border-b border-gray-100 pb-3">
                         <h3 class="font-bold text-slate-800 text-xs flex items-center">
-                            <span class="w-4 h-4 rounded-full bg-slate-800 text-white text-[10px] flex items-center justify-center mr-1.5 font-bold">2</span>
-                            비상 상황실 및 주요 연락처
+                            <span class="w-4 h-4 rounded-full bg-slate-800 text-white text-[10px] flex items-center justify-center mr-1.5 font-bold shrink-0">2</span>
+                            비상 상황실 및 사내 연락처
                         </h3>
-                        <div class="grid grid-cols-1 gap-1.5">
-                            <a href="tel:010-2104-7671" class="flex justify-between items-center p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 transition">
-                                <span class="font-bold text-slate-800"><i class="fa-solid fa-user-shield text-blue-600 mr-2"></i>안전환경팀</span>
-                                <span class="font-bold text-blue-600 flex items-center">010-2XXX-7XXX <i class="fa-solid fa-phone text-xs ml-1.5"></i></span>
+                        <div class="grid grid-cols-1 gap-1">
+                            <a href="tel:010-2104-7671" class="flex justify-between items-center p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 transition active-ring">
+                                <span class="font-bold text-slate-800 text-[11px]"><i class="fa-solid fa-user-shield text-blue-600 mr-1.5"></i>안전환경팀</span>
+                                <span class="font-bold text-blue-600 text-xs flex items-center">010-2104-7671 <i class="fa-solid fa-phone text-[10px] ml-1"></i></span>
                             </a>
-                            <a href="tel:010-3502-5932" class="flex justify-between items-center p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 transition">
-                                <span class="font-bold text-slate-800"><i class="fa-solid fa-users text-emerald-600 mr-2"></i>PEOPLE팀</span>
-                                <span class="font-bold text-blue-600 flex items-center">010-3XXX-5XXX <i class="fa-solid fa-phone text-xs ml-1.5"></i></span>
+                            <a href="tel:010-3502-5932" class="flex justify-between items-center p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 transition active-ring">
+                                <span class="font-bold text-slate-800 text-[11px]"><i class="fa-solid fa-users text-emerald-600 mr-1.5"></i>PEOPLE팀</span>
+                                <span class="font-bold text-blue-600 text-xs flex items-center">010-3502-5932 <i class="fa-solid fa-phone text-[10px] ml-1"></i></span>
                             </a>
-                            <a href="tel:031-230-4625" class="flex justify-between items-center p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 transition">
-                                <span class="font-bold text-slate-800"><i class="fa-solid fa-building-shield text-purple-600 mr-2"></i>보안실</span>
-                                <span class="font-bold text-blue-600 flex items-center">031-230-4625 <i class="fa-solid fa-phone text-xs ml-1.5"></i></span>
+                            <a href="tel:031-230-4625" class="flex justify-between items-center p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 transition active-ring">
+                                <span class="font-bold text-slate-800 text-[11px]"><i class="fa-solid fa-building-shield text-purple-600 mr-1.5"></i>보안실</span>
+                                <span class="font-bold text-blue-600 text-xs flex items-center">031-230-4625 <i class="fa-solid fa-phone text-[10px] ml-1"></i></span>
                             </a>
                         </div>
                     </div>
 
-                    <!-- 3. 대외 기관 -->
-                    <div class="space-y-2 border-b border-gray-100 pb-3">
+                    <!-- 3. 대외 기관 및 응급병원 (모바일 가로 스크롤 카드 형태) -->
+                    <div class="space-y-1.5">
                         <h3 class="font-bold text-slate-800 text-xs flex items-center">
-                            <span class="w-4 h-4 rounded-full bg-slate-800 text-white text-[10px] flex items-center justify-center mr-1.5 font-bold">3</span>
-                            대외 기관
+                            <span class="w-4 h-4 rounded-full bg-slate-800 text-white text-[10px] flex items-center justify-center mr-1.5 font-bold shrink-0">3</span>
+                            긴급신고 및 유관기관
                         </h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-[11px] text-left text-gray-700">
-                                <thead class="bg-gray-100 text-gray-600 font-bold border-b">
-                                    <tr>
-                                        <th class="p-1.5">기관명</th>
-                                        <th class="p-1.5">연락처</th>
-                                        <th class="p-1.5">비고</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-100">
-                                    <tr class="bg-red-50/50 font-bold text-red-900">
-                                        <td class="p-1.5">소방서</td>
-                                        <td class="p-1.5 text-red-600"><a href="tel:119" class="underline inline-flex items-center">119 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td>
-                                        <td class="p-1.5 text-[10px] text-red-700 font-bold">긴급신고 (최우선 신고)</td>
-                                    </tr>
-                                    <tr><td class="p-1.5 font-medium">노동부 평택지청</td><td class="p-1.5 text-blue-600"><a href="tel:031-646-1182" class="inline-flex items-center">031-646-1182 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 font-medium">안전공단 경기지사</td><td class="p-1.5 text-blue-600"><a href="tel:031-259-7162" class="inline-flex items-center">031-259-7162 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 font-medium">경기도청 환경안전관리과</td><td class="p-1.5 text-blue-600"><a href="tel:031-8008-3551" class="inline-flex items-center">031-8008-3551 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 font-medium">한국전기안전공사</td><td class="p-1.5 text-blue-600"><a href="tel:031-650-5201" class="inline-flex items-center">031-650-5201 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 font-medium">한국가스안전공사</td><td class="p-1.5 text-blue-600"><a href="tel:031-259-3500" class="inline-flex items-center">031-259-3500 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 font-medium">진위 파출소</td><td class="p-1.5 text-blue-600"><a href="tel:031-668-6112" class="inline-flex items-center">031-668-6112 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 font-medium">진위 119안전센터</td><td class="p-1.5 text-blue-600"><a href="tel:031-6623-7119" class="inline-flex items-center">031-6623-7119 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 font-medium">과학기술정보통신부</td><td class="p-1.5 text-blue-600"><a href="tel:02-2110-2782" class="inline-flex items-center">02-2110-2782 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 font-medium">한국전력공사</td><td class="p-1.5 text-blue-600"><a href="tel:031-650-4224" class="inline-flex items-center">031-650-4224 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 font-medium">평택시청 식품안전팀</td><td class="p-1.5 text-blue-600"><a href="tel:031-8024-3790" class="inline-flex items-center">031-8024-3790 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                    <tr><td class="p-1.5 font-medium">삼천리 도시가스</td><td class="p-1.5 text-blue-600"><a href="tel:031-223-3002" class="inline-flex items-center">031-223-3002 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-gray-400"></td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- 4. 전문의료기관 -->
-                    <div class="space-y-2">
-                        <h3 class="font-bold text-slate-800 text-xs flex items-center">
-                            <span class="w-4 h-4 rounded-full bg-slate-800 text-white text-[10px] flex items-center justify-center mr-1.5 font-bold">4</span>
-                            전문의료기관
-                        </h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-[11px] text-left text-gray-700">
-                                <thead class="bg-gray-100 text-gray-600 font-bold border-b">
-                                    <tr>
-                                        <th class="p-1.5">병원명</th>
-                                        <th class="p-1.5">연락처</th>
-                                        <th class="p-1.5">비고</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-100">
-                                    <tr><td class="p-1.5 font-medium">평택 성모병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:070-5012-3549" class="inline-flex items-center">070-5012-3549 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-gray-500">사업장 인근 병원</td></tr>
-                                    <tr><td class="p-1.5 font-medium">오산 조은병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:1544-5355" class="inline-flex items-center">1544-5355 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-gray-500">사업장 인근 병원</td></tr>
-                                    <tr><td class="p-1.5 font-medium">오산 한국병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:031-378-5119" class="inline-flex items-center">031-378-5119 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-gray-500">사업장 인근 병원</td></tr>
-                                    <tr><td class="p-1.5 font-medium">아주대 병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:1688-6114" class="inline-flex items-center">1688-6114 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-gray-500">대학 병원</td></tr>
-                                    <tr><td class="p-1.5 font-medium">한림대 동탄성심병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:1522-2500" class="inline-flex items-center">1522-2500 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-gray-500">대학 병원</td></tr>
-                                    <tr><td class="p-1.5 font-medium">카톨릭대 병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:1577-5855" class="inline-flex items-center">1577-5855 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-gray-500">대학 병원</td></tr>
-                                    <tr class="bg-amber-50/50"><td class="p-1.5 font-bold text-amber-900">베스티안 서울병원 (응급실)</td><td class="p-1.5 text-blue-600"><a href="tel:02-6211-7965" class="inline-flex items-center">02-6211-7965 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-amber-800 font-bold">화상 전문병원</td></tr>
-                                    <tr class="bg-amber-50/50"><td class="p-1.5 font-bold text-amber-900">수 병원</td><td class="p-1.5 text-blue-600"><a href="tel:031-273-8290" class="inline-flex items-center">031-273-8290 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-amber-800 font-bold">접합 전문병원</td></tr>
-                                    <tr class="bg-amber-50/50"><td class="p-1.5 font-bold text-amber-900">윌스 기념병원</td><td class="p-1.5 text-blue-600"><a href="tel:1577-8382" class="inline-flex items-center">1577-8382 <i class="fa-solid fa-phone text-[10px] ml-1"></i></a></td><td class="p-1.5 text-[10px] text-amber-800 font-bold">척추 전문병원</td></tr>
-                                </tbody>
-                            </table>
+                        <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+                            <a href="tel:119" class="p-2 rounded bg-red-50 border border-red-200 flex flex-col justify-between active-ring">
+                                <span class="font-bold text-red-900">소방서 (긴급)</span>
+                                <span class="text-red-600 font-black text-sm flex items-center justify-between mt-1">119 <i class="fa-solid fa-phone text-xs"></i></span>
+                            </a>
+                            <a href="tel:031-6623-7119" class="p-2 rounded bg-slate-50 border border-slate-200 flex flex-col justify-between active-ring">
+                                <span class="font-bold text-slate-800">진위 119센터</span>
+                                <span class="text-blue-600 font-bold text-xs flex items-center justify-between mt-1">031-6623-7119 <i class="fa-solid fa-phone text-xs"></i></span>
+                            </a>
+                            <a href="tel:031-668-6112" class="p-2 rounded bg-slate-50 border border-slate-200 flex flex-col justify-between active-ring">
+                                <span class="font-bold text-slate-800">진위 파출소</span>
+                                <span class="text-blue-600 font-bold text-xs flex items-center justify-between mt-1">031-668-6112 <i class="fa-solid fa-phone text-xs"></i></span>
+                            </a>
+                            <a href="tel:070-5012-3549" class="p-2 rounded bg-slate-50 border border-slate-200 flex flex-col justify-between active-ring">
+                                <span class="font-bold text-slate-800">평택 성모병원</span>
+                                <span class="text-blue-600 font-bold text-xs flex items-center justify-between mt-1">응급실 연결 <i class="fa-solid fa-phone text-xs"></i></span>
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- ② 비상물품 위치 (아코디언) -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button onclick="toggleEquipmentAccordion()" class="w-full p-3.5 text-left flex items-center justify-between hover:bg-gray-50 transition">
+            <div class="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden">
+                <button onclick="toggleEquipmentAccordion()" class="w-full p-3 text-left flex items-center justify-between hover:bg-gray-50 transition active-ring">
                     <span class="font-bold text-xs text-gray-800 flex items-center">
-                        <i class="fa-solid fa-boxes-packing text-red-600 text-sm mr-2.5"></i>
-                        비상물품 설치 위치
+                        <i class="fa-solid fa-boxes-packing text-red-600 text-sm mr-2 shrink-0"></i>
+                        사내 비상물품 설치 위치
                     </span>
                     <i id="equip-acc-icon" class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-200"></i>
                 </button>
-                <div id="equip-acc-content" class="hidden p-3.5 border-t border-gray-100 bg-slate-50">
-                    <div class="grid grid-cols-1 gap-2 text-xs">
-                        <div class="flex justify-between items-center p-2 rounded bg-white border border-gray-200">
-                            <span class="font-bold text-gray-700 flex items-center"><i class="fa-solid fa-heart-pulse text-red-500 mr-2"></i>AED (자동심장충격기)</span>
-                            <span class="text-gray-600 font-medium text-right">1층 로비, 1층 GATE2, 3층 EV홀</span>
+                <div id="equip-acc-content" class="hidden p-3 border-t border-gray-100 bg-slate-50">
+                    <div class="grid grid-cols-1 gap-1.5 text-xs">
+                        <div class="p-2 rounded bg-white border border-gray-200">
+                            <span class="font-bold text-gray-800 flex items-center"><i class="fa-solid fa-heart-pulse text-red-500 mr-1.5"></i>AED (자동심장충격기)</span>
+                            <span class="text-gray-600 text-[11px] block mt-0.5">1층 로비, 1층 GATE 2, 3층 EV홀</span>
                         </div>
-                        <div class="flex justify-between items-center p-2 rounded bg-white border border-gray-200">
-                            <span class="font-bold text-gray-700 flex items-center"><i class="fa-solid fa-mask-ventilator text-blue-500 mr-2"></i>공기호흡기</span>
-                            <span class="text-gray-600 font-medium text-right">1층 로비(60분 2개), 지하주차장 입구(30분 2개)</span>
+                        <div class="p-2 rounded bg-white border border-gray-200">
+                            <span class="font-bold text-gray-800 flex items-center"><i class="fa-solid fa-mask-ventilator text-blue-500 mr-1.5"></i>공기호흡기</span>
+                            <span class="text-gray-600 text-[11px] block mt-0.5">1층 로비(60분 2개), 지하주차장 입구(30분 2개)</span>
                         </div>
-                        <div class="flex justify-between items-center p-2 rounded bg-white border border-gray-200">
-                            <span class="font-bold text-gray-700 flex items-center"><i class="fa-solid fa-bed-pulse text-emerald-500 mr-2"></i>구조용 들것</span>
-                            <span class="text-gray-600 font-medium text-right">1층 로비, 지하 보호구함, 1층 보건실</span>
+                        <div class="p-2 rounded bg-white border border-gray-200">
+                            <span class="font-bold text-gray-800 flex items-center"><i class="fa-solid fa-bed-pulse text-emerald-500 mr-1.5"></i>구조용 들것</span>
+                            <span class="text-gray-600 text-[11px] block mt-0.5">1층 로비, 지하 보호구함, 1층 보건실</span>
                         </div>
-                        <div class="flex justify-between items-center p-2 rounded bg-white border border-gray-200">
-                            <span class="font-bold text-gray-700 flex items-center"><i class="fa-solid fa-car-burst text-orange-500 mr-2"></i>질식소화덮개</span>
-                            <span class="text-gray-600 font-medium text-right">지하주차장 입구</span>
+                        <div class="p-2 rounded bg-white border border-gray-200">
+                            <span class="font-bold text-gray-800 flex items-center"><i class="fa-solid fa-car-burst text-orange-500 mr-1.5"></i>질식소화덮개</span>
+                            <span class="text-gray-600 text-[11px] block mt-0.5">지하주차장 입구</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Manual Accordion List -->
-            <div id="manualContainer" class="space-y-2.5">
+            <div id="manualContainer" class="space-y-2">
                 <!-- Dynamic manual items inserted via JS -->
             </div>
 
@@ -577,27 +538,27 @@
 
     </main>
 
-    <!-- Bottom Mobile Nav Tabs (5-Tabs) -->
-    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-lg max-w-4xl mx-auto">
-        <div class="grid grid-cols-5 h-16">
-            <button onclick="switchTab(1)" id="nav-tab-1" class="nav-btn text-red-600 flex flex-col items-center justify-center space-y-1">
+    <!-- Bottom Mobile Nav Tabs (5-Tabs, Safe-area Aware) -->
+    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-xl max-w-4xl mx-auto safe-bottom">
+        <div class="grid grid-cols-5 h-15 py-1">
+            <button onclick="switchTab(1)" id="nav-tab-1" class="nav-btn text-red-600 flex flex-col items-center justify-center space-y-0.5 active-ring">
                 <i class="fa-solid fa-user-shield text-base"></i>
                 <span class="text-[10px] font-bold">내 임무</span>
             </button>
-            <button onclick="switchTab(2)" id="nav-tab-2" class="nav-btn text-gray-400 flex flex-col items-center justify-center space-y-1">
+            <button onclick="switchTab(2)" id="nav-tab-2" class="nav-btn text-gray-400 flex flex-col items-center justify-center space-y-0.5 active-ring">
                 <i class="fa-solid fa-triangle-exclamation text-base"></i>
-                <span class="text-[10px] font-bold">유형별대응</span>
+                <span class="text-[10px] font-bold">유형대응</span>
             </button>
-            <button onclick="switchTab(3)" id="nav-tab-3" class="nav-btn text-gray-400 flex flex-col items-center justify-center space-y-1">
+            <button onclick="switchTab(3)" id="nav-tab-3" class="nav-btn text-gray-400 flex flex-col items-center justify-center space-y-0.5 active-ring">
                 <i class="fa-solid fa-clipboard-check text-base"></i>
                 <span class="text-[10px] font-bold">피난유도</span>
             </button>
-            <button onclick="switchTab(4)" id="nav-tab-4" class="nav-btn text-gray-400 flex flex-col items-center justify-center space-y-1 relative">
-                <span class="absolute top-2 right-4 w-2 h-2 rounded-full bg-red-500"></span>
+            <button onclick="switchTab(4)" id="nav-tab-4" class="nav-btn text-gray-400 flex flex-col items-center justify-center space-y-0.5 relative active-ring">
+                <span class="absolute top-1.5 right-3 w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
                 <i class="fa-solid fa-chart-line text-base"></i>
                 <span class="text-[10px] font-bold">상황관제</span>
             </button>
-            <button onclick="switchTab(5)" id="nav-tab-5" class="nav-btn text-gray-400 flex flex-col items-center justify-center space-y-1">
+            <button onclick="switchTab(5)" id="nav-tab-5" class="nav-btn text-gray-400 flex flex-col items-center justify-center space-y-0.5 active-ring">
                 <i class="fa-solid fa-book-medical text-base"></i>
                 <span class="text-[10px] font-bold">매뉴얼</span>
             </button>
@@ -605,125 +566,130 @@
     </nav>
 
     <!-- Settings Modal -->
-    <div id="settingsModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-lg w-full p-5 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="font-bold text-base text-gray-900 flex items-center">
+    <div id="settingsModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-3">
+        <div class="bg-white rounded-xl max-w-lg w-full p-4 sm:p-5 shadow-2xl space-y-3.5 max-h-[92vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-2.5">
+                <h3 class="font-bold text-sm sm:text-base text-gray-900 flex items-center">
                     <i class="fa-solid fa-file-csv text-green-600 mr-2"></i>
                     구글 시트 실시간 양방향 연동 설정
                 </h3>
-                <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-gray-600">
+                <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-gray-600 p-1">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
             
-            <div class="space-y-2 text-xs">
-                <p class="text-gray-600 leading-relaxed">
-                    피난유도 체크리스트 실시간 전송 및 상황실 대시보드 조회를 위한 Google Apps Script 웹앱 URL을 입력하세요.
-                </p>
-                <div>
-                    <label class="block font-bold text-gray-700 mb-1">Apps Script Web App URL</label>
-                    <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full border rounded-lg p-2.5 text-xs bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
+            <div class="space-y-1.5 text-xs">
+                <label class="block font-bold text-gray-700">Apps Script Web App 배포 URL</label>
+                <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full border border-gray-300 rounded-lg p-2.5 text-xs bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none font-mono">
             </div>
 
-            <!-- Apps Script 코드 제공 안내 -->
-            <div class="bg-slate-50 p-3 rounded-lg text-[11px] text-gray-600 space-y-2 border border-slate-200">
+            <!-- Apps Script 코드 템플릿 제공 -->
+            <div class="bg-slate-900 text-slate-100 p-3 rounded-lg text-xs space-y-2">
                 <div class="flex justify-between items-center">
-                    <span class="font-bold text-slate-800">💡 Google Apps Script 코드 예시:</span>
-                    <button onclick="copyAppsScriptCode()" class="text-blue-600 hover:underline font-bold text-[10px]">
-                        <i class="fa-regular fa-copy mr-0.5"></i>스크립트 복사
+                    <span class="font-bold text-amber-400 text-[11px]"><i class="fa-solid fa-code mr-1"></i>Google Apps Script 전체 소스코드:</span>
+                    <button onclick="copyAppsScriptCode()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] px-2.5 py-1 rounded transition active-ring">
+                        <i class="fa-regular fa-copy mr-1"></i>코드 전체 복사
                     </button>
                 </div>
-                <p class="text-[10px] text-gray-500">
-                    구글 시트 [확장 프로그램] → [Apps Script]에 아래 코드를 넣고 <strong>배포(웹앱, 액세스 권한: 모든 사용자)</strong>하면 대피체크 즉시 구글시트에 기록되고 대시보드와 연동됩니다.
+                <p class="text-[10px] text-gray-300 leading-normal">
+                    구글 시트 생성 ➔ <strong>[확장 프로그램] ➔ [Apps Script]</strong>에 아래 코드를 그대로 붙여넣고 <strong>[배포] ➔ [새 배포] ➔ 유형: 웹 앱 (액세스 권한: 모든 사용자)</strong>로 배포하세요.
                 </p>
-                <textarea id="appsScriptTemplate" readonly rows="5" class="w-full bg-slate-900 text-slate-200 p-2 rounded text-[10px] font-mono leading-tight">
+                <textarea id="appsScriptTemplate" readonly rows="8" class="w-full bg-slate-950 text-emerald-400 p-2 rounded text-[10px] font-mono leading-tight resize-none border border-slate-800">
 function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = JSON.parse(e.postData.contents);
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("대피현황") || ss.getActiveSheet();
+  
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(["전송시각", "구역ID", "부서명", "담당자", "담당구역", "대피상태", "특이사항"]);
+    sheet.appendRow(["전송시각", "구역ID", "층", "부서명", "담당자", "담당구역", "대피상태", "특이사항"]);
+    sheet.getRange(1, 1, 1, 8).setBackground("#1e293b").setFontColor("#ffffff").setFontWeight("bold");
   }
+  
+  var data = JSON.parse(e.postData.contents);
+  var now = Utilities.formatDate(new Date(), "Asia/Seoul", "yyyy-MM-dd HH:mm:ss");
+  
   if (data.singleUpdate) {
-    var item = data.singleUpdate;
-    sheet.appendRow([new Date(), item.id, item.dept, item.name, item.area, item.status, item.remark]);
+    var u = data.singleUpdate;
+    sheet.appendRow([now, u.id, u.floor, u.dept, u.name, u.area, u.status, u.remark]);
   } else if (data.checklist) {
     data.checklist.forEach(function(item) {
-      sheet.appendRow([new Date(), item.id, item.dept, item.name, item.area, item.status, item.remark]);
+      sheet.appendRow([now, item.id, item.floor, item.dept, item.name, item.area, item.status, item.remark]);
     });
   }
-  return ContentService.createTextOutput(JSON.stringify({result:"success"})).setMimeType(ContentService.MimeType.JSON);
+  
+  return ContentService.createTextOutput(JSON.stringify({result: "success"}))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 function doGet(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = sheet.getDataRange().getValues();
-  return ContentService.createTextOutput(JSON.stringify({rows: data})).setMimeType(ContentService.MimeType.JSON);
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("대피현황") || ss.getActiveSheet();
+  var values = sheet.getDataRange().getValues();
+  return ContentService.createTextOutput(JSON.stringify({rows: values}))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 </textarea>
             </div>
 
-            <div class="flex gap-2 pt-2">
-                <button onclick="saveSettings()" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-lg text-xs hover:bg-blue-700 transition">
-                    저장하기
+            <div class="pt-1">
+                <button onclick="saveSettings()" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-lg text-xs hover:bg-blue-700 transition active-ring">
+                    설정 저장하기
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Remark Input Modal for Evacuation Check -->
-    <div id="remarkModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-sm w-full p-5 shadow-2xl space-y-3">
+    <div id="remarkModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-3">
+        <div class="bg-white rounded-xl max-w-sm w-full p-4 shadow-2xl space-y-2.5">
             <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-bold text-sm text-gray-900 flex items-center">
-                    <i class="fa-solid fa-pen-to-square text-amber-500 mr-2"></i>
+                <h3 class="font-bold text-xs sm:text-sm text-gray-900 flex items-center">
+                    <i class="fa-solid fa-pen-to-square text-amber-500 mr-1.5"></i>
                     대피 특이사항 / 잔류자 입력
                 </h3>
-                <button onclick="closeRemarkModal(true)" class="text-gray-400 hover:text-gray-600">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+                <button onclick="closeRemarkModal(true)" class="text-gray-400 hover:text-gray-600 p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
                 </button>
             </div>
             
-            <p class="text-xs text-gray-600">
-                해당 구역 수색 중 특이사항(잔류자, 부상자, 문 잠김 등)이 있나요?
+            <p class="text-[11px] text-gray-600 leading-normal">
+                해당 구역 수색 중 특이사항(잔류자 인원, 거동불가 부상자 등)이 있나요?
             </p>
 
             <div>
-                <textarea id="remarkInput" rows="3" placeholder="예: 회의실 미대피자 1명 발견(보조요원 인솔 중) / 특이사항 없으면 '특이사항 없음' 또는 SKIP" class="w-full border rounded-lg p-2.5 text-xs bg-gray-50 focus:ring-2 focus:ring-amber-500 outline-none resize-none"></textarea>
+                <textarea id="remarkInput" rows="3" placeholder="예: 3층 회의실 미대피자 1명 발견(보조요원 인솔 중)" class="w-full border border-gray-300 rounded-lg p-2 text-xs bg-gray-50 focus:ring-2 focus:ring-amber-500 outline-none resize-none"></textarea>
             </div>
 
             <div class="grid grid-cols-2 gap-2 pt-1">
-                <button onclick="confirmRemark(true)" class="bg-emerald-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-emerald-700 transition shadow">
-                    <i class="fa-solid fa-check mr-1"></i> 특이사항 저장 및 완료
+                <button onclick="confirmRemark(true)" class="bg-emerald-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-emerald-700 transition shadow-xs active-ring">
+                    <i class="fa-solid fa-check mr-1"></i> 특이사항 저장
                 </button>
-                <button onclick="confirmRemark(false)" class="bg-gray-200 text-gray-700 font-bold py-2 rounded-lg text-xs hover:bg-gray-300 transition">
-                    이상 없음 (대피완료)
+                <button onclick="confirmRemark(false)" class="bg-gray-100 text-gray-700 font-bold py-2 rounded-lg text-xs hover:bg-gray-200 transition active-ring">
+                    이상 없음 (완료)
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Reset Modal -->
-    <div id="resetModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-sm w-full p-5 shadow-2xl space-y-3">
+    <div id="resetModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-3">
+        <div class="bg-white rounded-xl max-w-sm w-full p-4 shadow-2xl space-y-3">
             <div class="flex justify-between items-center border-b pb-2">
                 <h3 class="font-bold text-sm text-gray-900 flex items-center">
-                    <i class="fa-solid fa-rotate-left text-red-500 mr-2"></i>
+                    <i class="fa-solid fa-rotate-left text-red-500 mr-1.5"></i>
                     체크리스트 초기화
                 </h3>
-                <button onclick="closeResetModal()" class="text-gray-400 hover:text-gray-600">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+                <button onclick="closeResetModal()" class="text-gray-400 hover:text-gray-600 p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
                 </button>
             </div>
-            <p class="text-xs text-gray-600 leading-relaxed">
-                모든 피난유도 구역의 대피완료 상태 및 특이사항 데이터를 초기화하시겠습니까?
+            <p class="text-xs text-gray-600 leading-normal">
+                모든 피난유도 구역의 대피완료 상태 및 기록된 특이사항 데이터를 초기화하시겠습니까?
             </p>
-            <div class="grid grid-cols-2 gap-2 pt-2">
-                <button onclick="confirmResetChecklist()" class="bg-red-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-red-700 transition shadow">
+            <div class="grid grid-cols-2 gap-2 pt-1">
+                <button onclick="confirmResetChecklist()" class="bg-red-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-red-700 transition shadow-xs active-ring">
                     초기화 실행
                 </button>
-                <button onclick="closeResetModal()" class="bg-gray-200 text-gray-700 font-bold py-2 rounded-lg text-xs hover:bg-gray-300 transition">
+                <button onclick="closeResetModal()" class="bg-gray-100 text-gray-700 font-bold py-2 rounded-lg text-xs hover:bg-gray-200 transition active-ring">
                     취소
                 </button>
             </div>
@@ -731,9 +697,9 @@ function doGet(e) {
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-full shadow-lg hidden flex items-center space-x-2 transition-all">
-        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
-        <span id="toastMessage">안내 메시지</span>
+    <div id="toast" class="fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 text-white text-[11px] sm:text-xs px-3.5 py-2 rounded-full shadow-lg hidden flex items-center space-x-2 transition-all max-w-[90vw] truncate">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 shrink-0"></i>
+        <span id="toastMessage" class="truncate">안내 메시지</span>
     </div>
 
     <script>
@@ -1012,7 +978,6 @@ function doGet(e) {
         let evacRemarksState = {};
         let currentActiveZoneId = null;
         let lastSyncTimestamp = null;
-        let isSyncing = false;
 
         function loadChecklistState() {
             const saved = localStorage.getItem('EVAC_CHECKLIST_STATE');
@@ -1069,29 +1034,29 @@ function doGet(e) {
             
             if (!roleName) {
                 const commonHtml = `
-                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-xl p-4 shadow-lg border border-slate-700">
-                        <div class="flex items-center justify-between border-b border-slate-700 pb-2.5 mb-3">
+                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-xl p-3.5 sm:p-4 shadow border border-slate-700">
+                        <div class="flex items-center justify-between border-b border-slate-700 pb-2 mb-2.5">
                             <div>
-                                <span class="text-[10px] font-bold bg-red-600 text-white px-2 py-0.5 rounded mr-1.5">공통 수칙</span>
+                                <span class="text-[9px] font-bold bg-red-600 text-white px-1.5 py-0.5 rounded mr-1">공통 수칙</span>
                                 <span class="text-xs text-slate-300">원익홀딩스 전 임직원</span>
-                                <h3 class="text-base font-extrabold text-white mt-0.5">화재 시 전사원 공통 대응 임무</h3>
+                                <h3 class="text-sm sm:text-base font-extrabold text-white mt-0.5">화재 시 전사원 공통 대응 임무</h3>
                             </div>
                         </div>
 
-                        <div class="space-y-2.5 text-xs">
-                            <div class="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700/80 space-y-2">
+                        <div class="space-y-2 text-xs">
+                            <div class="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700/80 space-y-1">
                                 <span class="text-amber-400 font-bold block text-[11px]"><i class="fa-solid fa-bullhorn mr-1"></i>1. 화재 전파 및 신고</span>
                                 <p class="text-slate-200 leading-relaxed">• 화재를 최초로 발견한 사람은 큰 소리로 '불이야!'를 외치고 가까운 비상경보 발신기 버튼을 누릅니다.</p>
                                 <p class="text-slate-200 leading-relaxed">• 안전한 위치에서 119 및 안전환경팀/보안실에 화재 위치를 즉시 신고합니다.</p>
                             </div>
 
-                            <div class="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700/80 space-y-2">
+                            <div class="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700/80 space-y-1">
                                 <span class="text-emerald-400 font-bold block text-[11px]"><i class="fa-solid fa-person-running mr-1"></i>2. 신속 피난 대피</span>
                                 <p class="text-slate-200 leading-relaxed">• 젖은 수건이나 옷으로 코와 입을 막고 자세를 낮춰 피난유도원의 안내에 따라 대피합니다.</p>
                                 <p class="text-slate-200 leading-relaxed">• 승강기(엘리베이터) 절대 사용 금지! 계단을 이용하여 건물 밖으로 대피합니다.</p>
                             </div>
 
-                            <div class="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700/80 space-y-2">
+                            <div class="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700/80 space-y-1">
                                 <span class="text-blue-400 font-bold block text-[11px]"><i class="fa-solid fa-users mr-1"></i>3. 집결지 집결 및 인원 보고</span>
                                 <p class="text-slate-200 leading-relaxed">• 1차 집결지(건물 후문 공터)로 신속히 이동 후 부서별로 인원을 파악합니다.</p>
                                 <p class="text-slate-200 leading-relaxed">• 동료 미대피자가 있을 경우 즉시 피난유도반 및 상황실에 전달합니다.</p>
@@ -1107,27 +1072,27 @@ function doGet(e) {
             if (!data) return;
 
             const html = `
-                <div class="bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-xl p-4 shadow-lg border border-slate-700">
-                    <div class="flex items-center justify-between border-b border-slate-700 pb-2.5 mb-3">
+                <div class="bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-xl p-3.5 sm:p-4 shadow border border-slate-700">
+                    <div class="flex items-center justify-between border-b border-slate-700 pb-2 mb-2.5">
                         <div>
-                            <span class="text-[10px] font-bold bg-red-600 text-white px-2 py-0.5 rounded mr-1.5">${data.category}</span>
+                            <span class="text-[9px] font-bold bg-red-600 text-white px-1.5 py-0.5 rounded mr-1">${data.category}</span>
                             <span class="text-xs text-slate-300">${data.dept}</span>
-                            <h3 class="text-base font-extrabold text-white mt-0.5">${data.group}</h3>
+                            <h3 class="text-sm sm:text-base font-extrabold text-white mt-0.5">${data.group}</h3>
                         </div>
-                        <div class="text-right">
-                            <span class="text-[10px] text-slate-400 block">인원 (최소/기준)</span>
-                            <span class="text-sm font-bold text-amber-400">${data.minCount}명 / ${data.baseCount}명</span>
+                        <div class="text-right shrink-0">
+                            <span class="text-[9px] text-slate-400 block">인원(최소/기준)</span>
+                            <span class="text-xs sm:text-sm font-bold text-amber-400">${data.minCount}명 / ${data.baseCount}명</span>
                         </div>
                     </div>
 
-                    <div class="space-y-2.5 text-xs">
+                    <div class="space-y-2 text-xs">
                         <div>
                             <span class="text-slate-400 font-semibold block text-[11px] mb-0.5"><i class="fa-solid fa-list-check text-blue-400 mr-1"></i>편성 임무:</span>
                             <p class="text-slate-200 font-medium whitespace-pre-line leading-relaxed">${data.roles}</p>
                         </div>
 
                         <div class="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700/80">
-                            <span class="text-slate-400 font-semibold block text-[11px] mb-0.5"><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i>담당 구역 및 비상 시 핵심 임무:</span>
+                            <span class="text-slate-400 font-semibold block text-[11px] mb-0.5"><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i>담당 구역 및 핵심 임무:</span>
                             <p class="text-slate-100 font-bold whitespace-pre-line leading-relaxed">${data.mainTask}</p>
                         </div>
 
@@ -1137,7 +1102,7 @@ function doGet(e) {
                         </div>
 
                         ${data.equip ? `
-                        <div class="pt-1 border-t border-slate-700/50">
+                        <div class="pt-1.5 border-t border-slate-700/50">
                             <span class="text-slate-400 font-semibold inline-block text-[11px]"><i class="fa-solid fa-toolbox text-orange-400 mr-1"></i>관련 장비:</span>
                             <span class="text-slate-200 ml-1 font-medium">${data.equip}</span>
                         </div>
@@ -1154,19 +1119,19 @@ function doGet(e) {
             if (!container) return;
             
             container.innerHTML = INCIDENT_DATA.map((item, idx) => `
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <button onclick="toggleIncidentAccordion(${idx})" class="w-full p-3.5 text-left flex items-center justify-between hover:bg-gray-50 transition">
+                <div class="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden">
+                    <button onclick="toggleIncidentAccordion(${idx})" class="w-full p-3 text-left flex items-center justify-between hover:bg-gray-50 transition active-ring">
                         <span class="font-bold text-xs text-gray-800 flex items-center">
-                            <i class="fa-solid ${item.icon} ${item.color} text-sm mr-2.5 w-4 text-center"></i>
+                            <i class="fa-solid ${item.icon} ${item.color} text-sm mr-2 w-4 text-center shrink-0"></i>
                             ${item.title}
                         </span>
                         <i id="inc-icon-${idx}" class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-200"></i>
                     </button>
-                    <div id="inc-content-${idx}" class="hidden p-3.5 bg-slate-50 border-t border-gray-100 text-xs">
-                        <ul class="space-y-2 text-gray-700 font-medium">
+                    <div id="inc-content-${idx}" class="hidden p-3 bg-slate-50 border-t border-gray-100 text-xs">
+                        <ul class="space-y-1.5 text-gray-700 font-medium">
                             ${item.steps.map(step => `
                                 <li class="flex items-start">
-                                    <span class="text-red-500 font-bold mr-1.5">•</span>
+                                    <span class="text-red-500 font-bold mr-1.5 shrink-0">•</span>
                                     <span class="leading-relaxed">${step}</span>
                                 </li>
                             `).join('')}
@@ -1201,38 +1166,40 @@ function doGet(e) {
                 const isChecked = !!evacChecklistState[item.id];
                 const remark = evacRemarksState[item.id] || "";
                 return `
-                    <div class="bg-white rounded-xl shadow-sm border ${isChecked ? 'border-emerald-500 bg-emerald-50/20' : 'border-gray-200'} p-3.5 space-y-2 transition">
-                        <div class="flex items-start justify-between">
-                            <div>
-                                <span class="text-[10px] font-bold bg-slate-800 text-white px-2 py-0.5 rounded mr-1">${item.floor}</span>
-                                <span class="text-[10px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded mr-1">${item.dept}</span>
-                                <span class="text-xs font-extrabold text-blue-700">${item.name}</span>
-                                <h4 class="text-xs font-bold text-gray-900 mt-1 whitespace-pre-line">${item.task}</h4>
+                    <div class="bg-white rounded-xl shadow-xs border ${isChecked ? 'border-emerald-500 bg-emerald-50/20' : 'border-gray-200'} p-3 space-y-2 transition">
+                        <div class="flex items-start justify-between gap-1.5">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-1 flex-wrap">
+                                    <span class="text-[9px] font-black bg-slate-800 text-white px-1.5 py-0.5 rounded shrink-0">${item.floor}</span>
+                                    <span class="text-[9.5px] font-bold bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded truncate">${item.dept}</span>
+                                </div>
+                                <span class="text-xs font-extrabold text-blue-700 block mt-0.5">${item.name}</span>
+                                <h4 class="text-xs font-bold text-gray-900 whitespace-pre-line mt-0.5 leading-snug">${item.task}</h4>
                             </div>
-                            <label class="flex items-center cursor-pointer space-x-1.5 ${isChecked ? 'bg-emerald-100 border-emerald-400' : 'bg-slate-50 border-gray-200'} border p-1.5 rounded-lg active-ring transition">
+                            <label class="flex items-center cursor-pointer space-x-1.5 ${isChecked ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-slate-50 border-gray-200 text-gray-600'} border px-2 py-1.5 rounded-lg active-ring transition shrink-0">
                                 <input type="checkbox" onchange="handleChecklistClick('${item.id}', this.checked)" ${isChecked ? 'checked' : ''} class="w-4 h-4 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500">
-                                <span class="text-[11px] ${isChecked ? 'text-emerald-800 font-extrabold' : 'text-gray-600 font-semibold'}">
+                                <span class="text-[11px] font-bold">
                                     대피완료
                                 </span>
                             </label>
                         </div>
 
-                        <div class="bg-gray-50 p-2.5 rounded-lg text-xs space-y-1">
-                            <p class="font-bold text-gray-800 whitespace-pre-line"><i class="fa-solid fa-bullseye text-red-500 mr-1"></i>${item.area}</p>
-                            <p class="text-gray-600 font-medium"><i class="fa-solid fa-route text-blue-500 mr-1"></i>이동: ${item.route}</p>
+                        <div class="bg-gray-50 p-2 rounded-lg text-xs space-y-1">
+                            <p class="font-bold text-gray-800 whitespace-pre-line leading-snug"><i class="fa-solid fa-bullseye text-red-500 mr-1"></i>${item.area}</p>
+                            <p class="text-gray-600 font-medium text-[11px]"><i class="fa-solid fa-route text-blue-500 mr-1"></i>이동: ${item.route}</p>
                         </div>
 
                         ${isChecked && remark ? `
                         <div class="bg-amber-50 text-amber-900 border border-amber-200 p-2 rounded-lg text-xs flex items-start space-x-1.5">
-                            <i class="fa-solid fa-comment-dots text-amber-600 mt-0.5"></i>
-                            <div>
-                                <span class="font-bold block text-[11px] text-amber-800">특이사항:</span>
-                                <p class="text-xs font-medium text-amber-900 whitespace-pre-line">${remark}</p>
+                            <i class="fa-solid fa-comment-dots text-amber-600 mt-0.5 shrink-0"></i>
+                            <div class="min-w-0">
+                                <span class="font-bold block text-[10.5px] text-amber-800">특이사항:</span>
+                                <p class="text-xs font-medium text-amber-900 whitespace-pre-line leading-relaxed">${remark}</p>
                             </div>
                         </div>
                         ` : ''}
 
-                        <div class="text-[11px] text-gray-500 bg-slate-50/50 p-2 rounded border border-gray-100 whitespace-pre-line">
+                        <div class="text-[10px] text-gray-500 bg-slate-50/50 p-1.5 rounded border border-gray-100 whitespace-pre-line leading-tight">
                             ${item.note}
                         </div>
                     </div>
@@ -1261,7 +1228,7 @@ function doGet(e) {
             if (!currentActiveZoneId) return;
 
             evacChecklistState[currentActiveZoneId] = true;
-            let currentRemark = '특이사항 없음';
+            let currentRemark = '이상 없음';
             
             if (isSave) {
                 const text = document.getElementById('remarkInput').value.trim();
@@ -1280,7 +1247,7 @@ function doGet(e) {
             closeRemarkModal(false);
             renderEvacTable();
             
-            // 구글 시트로 해당 구역 '대피완료' 자동 전송!
+            // 구글 시트로 해당 구역 대피완료 자동 전송
             syncSingleZoneToGoogleSheets(zoneId, true, currentRemark);
         }
 
@@ -1331,10 +1298,10 @@ function doGet(e) {
 
             // KPI 업데이트
             document.getElementById('dashKpiPercent').innerText = `${percentage}%`;
-            document.getElementById('dashKpiCompleted').innerHTML = `${completed} <span class="text-sm font-semibold text-gray-500">/ ${total}</span>`;
+            document.getElementById('dashKpiCompleted').innerHTML = `${completed} <span class="text-xs font-semibold text-gray-400">/ ${total}</span>`;
             document.getElementById('dashKpiRemaining').innerText = remaining;
             document.getElementById('dashKpiRemarks').innerText = remarksCount;
-            document.getElementById('dashProgressLabel').innerText = `${completed} / ${total} 구역 대피완료 (${percentage}%)`;
+            document.getElementById('dashProgressLabel').innerText = `${completed} / ${total} 구역 완료 (${percentage}%)`;
             document.getElementById('dashMainProgressBar').style.width = `${percentage}%`;
 
             // 10개 구역 카드 그리드 렌더링
@@ -1343,33 +1310,33 @@ function doGet(e) {
                 gridContainer.innerHTML = EVAC_DATA.map(item => {
                     const isDone = !!evacChecklistState[item.id];
                     const remark = evacRemarksState[item.id] || "";
-                    const hasRemark = isDone && remark && remark !== '특이사항 없음';
+                    const hasRemark = isDone && remark && remark !== '이상 없음';
 
                     return `
-                        <div class="p-3 rounded-xl border ${isDone ? 'bg-emerald-50/70 border-emerald-300' : 'bg-red-50/50 border-red-200'} transition shadow-sm flex flex-col justify-between">
-                            <div class="flex items-start justify-between gap-2">
-                                <div>
-                                    <div class="flex items-center gap-1.5 mb-1">
-                                        <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-800 text-white">${item.floor}</span>
-                                        <span class="text-[10px] font-bold text-slate-700">${item.dept}</span>
+                        <div class="p-2.5 rounded-xl border ${isDone ? 'bg-emerald-50/70 border-emerald-300' : 'bg-red-50/50 border-red-200'} transition shadow-xs flex flex-col justify-between">
+                            <div class="flex items-start justify-between gap-1.5">
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-1 mb-0.5">
+                                        <span class="text-[9px] font-black px-1.5 py-0.2 rounded bg-slate-800 text-white shrink-0">${item.floor}</span>
+                                        <span class="text-[10px] font-bold text-slate-700 truncate">${item.dept}</span>
                                     </div>
-                                    <h4 class="text-xs font-bold text-gray-900">${item.task.replace('ㅇ ', '')}</h4>
+                                    <h4 class="text-xs font-bold text-gray-900 leading-snug">${item.task.replace('ㅇ ', '')}</h4>
                                 </div>
                                 <span class="px-2 py-0.5 rounded text-[10px] font-extrabold shrink-0 ${isDone ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white animate-pulse'}">
-                                    ${isDone ? '대피 완료' : '수색 중'}
+                                    ${isDone ? '대피완료' : '수색 중'}
                                 </span>
                             </div>
 
                             ${hasRemark ? `
-                                <div class="mt-2 bg-amber-100/80 border border-amber-300 text-amber-900 p-1.5 rounded text-[11px] font-medium flex items-start gap-1">
-                                    <i class="fa-solid fa-triangle-exclamation text-amber-600 mt-0.5 text-xs"></i>
+                                <div class="mt-1.5 bg-amber-100/90 border border-amber-300 text-amber-900 p-1.5 rounded text-[10.5px] font-medium flex items-start gap-1">
+                                    <i class="fa-solid fa-triangle-exclamation text-amber-600 mt-0.5 text-xs shrink-0"></i>
                                     <span class="leading-tight font-bold">${remark}</span>
                                 </div>
                             ` : ''}
 
-                            <div class="mt-2 pt-2 border-t border-gray-200/60 text-[10px] text-gray-500 flex justify-between items-center">
-                                <span>담당: ${item.name}</span>
-                                <span class="font-medium text-slate-600">${isDone ? '동기화 완료' : '확인 필요'}</span>
+                            <div class="mt-1.5 pt-1.5 border-t border-gray-200/60 text-[10px] text-gray-500 flex justify-between items-center">
+                                <span class="truncate">담당: ${item.name}</span>
+                                <span class="font-bold text-slate-600 shrink-0">${isDone ? '동기화 완료' : '미완료'}</span>
                             </div>
                         </div>
                     `;
@@ -1382,19 +1349,19 @@ function doGet(e) {
                 const remarksList = EVAC_DATA.filter(item => evacChecklistState[item.id] && evacRemarksState[item.id]);
                 if (remarksList.length === 0) {
                     feedContainer.innerHTML = `
-                        <div class="text-center py-6 text-gray-400 text-xs bg-slate-50 rounded-lg border border-dashed border-gray-200">
-                            <i class="fa-solid fa-circle-check text-emerald-500 text-lg mb-1 block"></i>
+                        <div class="text-center py-4 text-gray-400 text-xs bg-slate-50 rounded-lg border border-dashed border-gray-200">
+                            <i class="fa-solid fa-circle-check text-emerald-500 text-base mb-0.5 block"></i>
                             보고된 잔류자나 특이사항이 없습니다. 모든 구역이 안전합니다.
                         </div>
                     `;
                 } else {
                     feedContainer.innerHTML = remarksList.map(item => `
-                        <div class="bg-amber-50 border-l-4 border-amber-500 p-2.5 rounded-r-lg text-xs text-amber-900 flex justify-between items-start">
-                            <div>
-                                <span class="font-bold text-amber-800">[${item.floor} / ${item.dept}]</span>
-                                <p class="font-medium mt-0.5">${evacRemarksState[item.id]}</p>
+                        <div class="bg-amber-50 border-l-4 border-amber-500 p-2 rounded-r-lg text-xs text-amber-900 flex justify-between items-start gap-1">
+                            <div class="min-w-0">
+                                <span class="font-bold text-amber-800 text-[11px] block">[${item.floor} / ${item.dept}]</span>
+                                <p class="font-medium text-xs mt-0.5 leading-snug">${evacRemarksState[item.id]}</p>
                             </div>
-                            <span class="text-[10px] text-amber-700 bg-amber-100 px-2 py-0.5 rounded font-bold">확인필요</span>
+                            <span class="text-[9px] text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded font-bold shrink-0">조치요망</span>
                         </div>
                     `).join('');
                 }
@@ -1407,7 +1374,7 @@ function doGet(e) {
             }
         }
 
-        // 단일 구역 체크 즉시 구글 시트로 백그라운드 자동 전송!
+        // 단일 구역 체크 즉시 구글 시트로 백그라운드 자동 전송
         async function syncSingleZoneToGoogleSheets(zoneId, isDone, remark) {
             const scriptUrl = localStorage.getItem('APPS_SCRIPT_URL') || DEFAULT_SCRIPT_URL;
             const target = EVAC_DATA.find(d => d.id === zoneId);
@@ -1419,8 +1386,8 @@ function doGet(e) {
             const miniBadge = document.getElementById('autoSyncMiniIndicator');
             const mainBadge = document.getElementById('syncStatusBadge');
             
-            if (miniBadge) miniBadge.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-amber-500"></i> 자동 전송 중...`;
-            if (mainBadge) mainBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-up text-[9px]"></i> 전송 중`;
+            if (miniBadge) miniBadge.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-amber-500 text-[8px]"></i> 전송 중...`;
+            if (mainBadge) mainBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-up text-[8px]"></i> 전송 중`;
 
             const payload = {
                 timestamp: new Date().toLocaleString('ko-KR'),
@@ -1445,14 +1412,14 @@ function doGet(e) {
                     body: JSON.stringify(payload)
                 });
                 
-                showToast(`[${target.floor}] ${target.dept} 대피현황이 구글시트로 자동 전송되었습니다.`);
-                if (miniBadge) miniBadge.innerHTML = `<i class="fa-solid fa-circle text-[8px] text-emerald-500"></i> 자동 동기화됨 (${nowTime})`;
-                if (mainBadge) mainBadge.innerHTML = `<i class="fa-solid fa-cloud-check text-[9px]"></i> 자동연동`;
+                showToast(`[${target.floor}] ${target.dept} 대피현황이 자동 전송되었습니다.`);
+                if (miniBadge) miniBadge.innerHTML = `<i class="fa-solid fa-circle text-[7px] text-emerald-500"></i> 자동 동기화됨 (${nowTime})`;
+                if (mainBadge) mainBadge.innerHTML = `<i class="fa-solid fa-cloud-check text-[8px]"></i> 자동연동`;
                 renderDashboard();
             } catch (err) {
                 console.warn('Google Sheets sync error:', err);
-                if (miniBadge) miniBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-500"></i> 로컬저장 완료`;
-                if (mainBadge) mainBadge.innerHTML = `<i class="fa-solid fa-cloud text-[9px]"></i> 로컬모드`;
+                if (miniBadge) miniBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-500 text-[8px]"></i> 로컬저장 완료`;
+                if (mainBadge) mainBadge.innerHTML = `<i class="fa-solid fa-cloud text-[8px]"></i> 로컬저장`;
                 showToast(`로컬 저장 완료 (구글 시트 연동 대기)`);
             }
         }
@@ -1472,7 +1439,7 @@ function doGet(e) {
                     name: item.name,
                     area: item.area.replace(/\n/g, ' '),
                     status: evacChecklistState[item.id] ? '완료' : '미완료',
-                    remark: evacChecklistState[item.id] ? (evacRemarksState[item.id] || '특이사항 없음') : '-'
+                    remark: evacChecklistState[item.id] ? (evacRemarksState[item.id] || '이상 없음') : '-'
                 }))
             };
 
@@ -1487,10 +1454,10 @@ function doGet(e) {
                 });
                 lastSyncTimestamp = new Date().toLocaleTimeString('ko-KR');
                 renderDashboard();
-                showToast('구글 시트 전체 동기화가 성공적으로 완료되었습니다!');
+                showToast('구글 시트 전체 동기화가 완료되었습니다!');
             } catch (err) {
                 console.error(err);
-                showToast('전송 중 오류가 발생했습니다. 네트워크 상태를 확인하세요.', true);
+                showToast('전송 중 오류가 발생했습니다. 네트워크를 확인하세요.', true);
             }
         }
 
@@ -1502,8 +1469,8 @@ function doGet(e) {
             setTimeout(() => {
                 renderDashboard();
                 if (icon) icon.classList.remove('fa-spin');
-                if (showIndicator) showToast('대시보드 화면이 최신 상태로 갱신되었습니다.');
-            }, 500);
+                if (showIndicator) showToast('대시보드가 최신 상태로 갱신되었습니다.');
+            }, 400);
         }
 
         function renderManuals() {
@@ -1511,45 +1478,45 @@ function doGet(e) {
             if (!container) return;
 
             container.innerHTML = MANUAL_DATA.map((item, idx) => `
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <button onclick="toggleManualAccordion(${idx})" class="w-full p-3.5 text-left flex items-center justify-between hover:bg-gray-50 transition">
+                <div class="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden">
+                    <button onclick="toggleManualAccordion(${idx})" class="w-full p-3 text-left flex items-center justify-between hover:bg-gray-50 transition active-ring">
                         <span class="font-bold text-xs text-gray-800 flex items-center">
-                            <i class="fa-solid ${item.icon} text-red-500 text-sm mr-2.5 w-4 text-center"></i>
+                            <i class="fa-solid ${item.icon} text-red-500 text-sm mr-2 w-4 text-center shrink-0"></i>
                             ${item.title}
                         </span>
                         <i id="man-icon-${idx}" class="fa-solid fa-chevron-down text-gray-400 text-xs transition-transform duration-200"></i>
                     </button>
-                    <div id="man-content-${idx}" class="hidden p-3.5 bg-slate-50 border-t border-gray-100 text-xs space-y-3">
-                        <ol class="space-y-1.5 list-decimal list-inside text-gray-700 font-medium">
-                            ${item.steps.map(step => `<li class="leading-relaxed pl-1">${step}</li>`).join('')}
+                    <div id="man-content-${idx}" class="hidden p-3 bg-slate-50 border-t border-gray-100 text-xs space-y-2.5">
+                        <ol class="space-y-1 list-decimal list-inside text-gray-700 font-medium leading-relaxed">
+                            ${item.steps.map(step => `<li class="pl-0.5">${step}</li>`).join('')}
                         </ol>
 
                         ${item.scriptNotice ? `
-                        <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-lg text-amber-900 font-medium whitespace-pre-line text-[11px] leading-relaxed">
+                        <div class="bg-amber-50 border border-amber-200 p-2 rounded-lg text-amber-900 font-medium whitespace-pre-line text-[10.5px] leading-relaxed">
                             ${item.scriptNotice}
                         </div>
                         ` : ''}
 
                         ${item.docUrl ? `
-                        <div class="pt-2 border-t border-gray-200/80 flex items-center justify-between">
+                        <div class="pt-1.5 border-t border-gray-200/80 flex items-center justify-between">
                             <span class="text-xs font-bold text-slate-700 flex items-center">
-                                <i class="fa-solid fa-file-lines text-blue-600 text-sm mr-1.5"></i>
+                                <i class="fa-solid fa-file-lines text-blue-600 text-sm mr-1"></i>
                                 상세 웹 매뉴얼
                             </span>
-                            <a href="${item.docUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] shadow-sm transition active-ring">
-                                <i class="fa-solid fa-arrow-up-right-from-square mr-1 text-xs"></i> ${item.docLabel || '상세 매뉴얼'}
+                            <a href="${item.docUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-2 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10.5px] shadow-xs transition active-ring">
+                                <i class="fa-solid fa-arrow-up-right-from-square mr-1 text-[10px]"></i> ${item.docLabel || '상세 매뉴얼'}
                             </a>
                         </div>
                         ` : ''}
 
                         ${item.videoUrl ? `
-                        <div class="pt-2 border-t border-gray-200/80 flex items-center justify-between">
+                        <div class="pt-1.5 border-t border-gray-200/80 flex items-center justify-between">
                             <span class="text-xs font-bold text-slate-700 flex items-center">
-                                <i class="fa-solid fa-circle-play text-red-600 text-sm mr-1.5"></i>
-                                참고 영상
+                                <i class="fa-solid fa-circle-play text-red-600 text-sm mr-1"></i>
+                                동영상 교육
                             </span>
-                            <a href="${item.videoUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-2.5 py-1 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] shadow-sm transition active-ring">
-                                <i class="fa-brands fa-youtube mr-1 text-sm"></i> 영상 시청하기
+                            <a href="${item.videoUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white font-bold text-[10.5px] shadow-xs transition active-ring">
+                                <i class="fa-brands fa-youtube mr-1 text-xs"></i> 영상 보기
                             </a>
                         </div>
                         ` : ''}
@@ -1601,7 +1568,7 @@ function doGet(e) {
             const textarea = document.getElementById('appsScriptTemplate');
             textarea.select();
             document.execCommand('copy');
-            showToast('Apps Script 코드가 클립보드에 복사되었습니다!');
+            showToast('Apps Script 코드가 복사되었습니다! 구글 시트에 붙여넣으세요.');
         }
 
         // Toast utility
@@ -1612,15 +1579,15 @@ function doGet(e) {
 
             message.innerText = msg;
             if (isError) {
-                icon.className = 'fa-solid fa-triangle-exclamation text-amber-400';
+                icon.className = 'fa-solid fa-triangle-exclamation text-amber-400 shrink-0';
             } else {
-                icon.className = 'fa-solid fa-circle-check text-emerald-400';
+                icon.className = 'fa-solid fa-circle-check text-emerald-400 shrink-0';
             }
 
             toast.classList.remove('hidden');
             setTimeout(() => {
                 toast.classList.add('hidden');
-            }, 3000);
+            }, 2500);
         }
 
         window.onload = function() {
