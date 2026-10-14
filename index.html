@@ -40,7 +40,7 @@
             font-family: 'Pretendard', sans-serif;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
-            word-break: keep-all; /* 모바일에서 한글 단어 단위 개행으로 글자 밀림 방지 */
+            word-break: keep-all;
             overflow-wrap: break-word;
         }
         .keep-all {
@@ -63,7 +63,6 @@
         .animate-live-badge {
             animation: pulse-subtle 2s infinite ease-in-out;
         }
-        /* iOS Safe Area 대응 */
         .safe-bottom {
             padding-bottom: env(safe-area-inset-bottom, 0px);
         }
@@ -99,12 +98,18 @@
         </div>
     </header>
 
+    <!-- Network Offline Warning Banner (음영구역 감지 시 노출) -->
+    <div id="offlineNoticeBanner" class="hidden bg-amber-500 text-slate-950 px-3 py-1.5 text-[11px] font-bold text-center flex items-center justify-center gap-1.5 shadow-sm">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>통신 음영구역(오프라인) 상태입니다. 체크 데이터는 안전하게 임시 저장되며 복귀 시 자동 전송됩니다.</span>
+    </div>
+
     <main class="max-w-4xl mx-auto px-3 sm:px-5 pt-3">
 
         <!-- ==================== TAB 1: 내 임무 ==================== -->
         <section id="tab-1" class="tab-content space-y-3.5">
             
-            <!-- ① 화재 시 공통 대응 절차 (모바일 4분할 가로 스크롤 붕괴 방지) -->
+            <!-- ① 화재 시 공통 대응 절차 -->
             <div class="bg-white rounded-xl shadow-sm p-3.5 sm:p-4 border border-gray-200">
                 <h2 class="text-xs sm:text-sm font-bold text-gray-900 mb-2.5 flex items-center">
                     <i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1.5 sm:mr-2"></i>
@@ -134,24 +139,65 @@
                 </div>
             </div>
 
-            <!-- ② 내 임무 카드 선택/확인 -->
+            <!-- ② 내 임무 카드 선택 (2단계 드롭다운: 1차 역할 → 2차 세부 구역) -->
             <div class="bg-white rounded-xl shadow-sm p-3.5 sm:p-4 border border-gray-200">
                 <div class="flex items-center justify-between mb-2">
                     <h2 class="text-xs sm:text-sm font-bold text-gray-900 flex items-center">
                         <i class="fa-solid fa-id-card text-blue-600 mr-1.5 sm:mr-2"></i>
                         나의 임무 카드 선택
                     </h2>
-                    <span class="text-[10px] sm:text-xs text-gray-500">본인 역할 지정</span>
+                    <span class="text-[10px] sm:text-xs text-gray-500">2단계 역할/구역 지정</span>
                 </div>
                 
-                <select id="myRoleSelect" onchange="renderMyRoleCard()" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-xs sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 font-medium">
-                    <option value="" selected>[공통] 화재 시 전사원 공통 대응 임무</option>
-                    <option value="지휘부">지휘부 (대표이사 / 소방대장)</option>
-                    <option value="지휘통제반">지휘통제반 (안전환경팀)</option>
-                    <option value="초동대응반">초동대응반 (안전환경팀)</option>
-                    <option value="방호안전반">방호안전반 (설비기술G)</option>
-                    <option value="피난유도반">피난유도반 (각 부서)</option>
-                </select>
+                <div class="space-y-2">
+                    <!-- 1단계: 주요 조직/반 선택 -->
+                    <div>
+                        <label class="block text-[10.5px] font-bold text-gray-600 mb-1">
+                            <span class="w-3.5 h-3.5 rounded-full bg-blue-600 text-white inline-flex items-center justify-center text-[9px] mr-1">1</span>
+                            소속 비상대응 조직 (1차)
+                        </label>
+                        <select id="myRoleSelect" onchange="handlePrimaryRoleChange()" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-xs sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 font-medium transition">
+                            <option value="" selected>[공통] 화재 시 전사원 공통 대응 임무</option>
+                            <option value="지휘부">지휘부 (대표이사 / 소방대장)</option>
+                            <option value="지휘통제반">지휘통제반 (안전환경팀)</option>
+                            <option value="초동대응반">초동대응반 (안전환경팀)</option>
+                            <option value="방호안전반">방호안전반 (설비기술G)</option>
+                            <option value="피난유도반">피난유도반 (10개 구역 수색·유도요원)</option>
+                        </select>
+                    </div>
+
+                    <!-- 2단계: 피난유도반 선택 시에만 동적 활성화되는 세부구역 드롭다운 -->
+                    <div id="evacSubZoneContainer" class="hidden bg-blue-50/70 border border-blue-200 rounded-lg p-2.5 space-y-1.5 transition-all duration-200">
+                        <label class="block text-[10.5px] font-bold text-blue-900">
+                            <span class="w-3.5 h-3.5 rounded-full bg-blue-600 text-white inline-flex items-center justify-center text-[9px] mr-1">2</span>
+                            담당 피난유도 구역 및 부서 선택 (2차)
+                        </label>
+                        <select id="evacSubZoneSelect" onchange="renderMyRoleCard()" class="w-full bg-white border border-blue-300 text-gray-900 text-xs sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2 font-medium">
+                            <option value="ALL" selected>[총괄] 피난유도반 공통 행동수칙</option>
+                            <option value="EVAC_01">[집결지] 영업팀 / 글로벌영업팀 (집결지 통제)</option>
+                            <option value="EVAC_02">[지하층] 연구소 (지하 LAB·창고·변전실)</option>
+                            <option value="EVAC_03">[1·2층] 구매팀 (로비·회의실·피트니스)</option>
+                            <option value="EVAC_04">[1층] 품질G (GPU크린룸·분석실)</option>
+                            <option value="EVAC_05">[1·2층] 생산기술팀 (주안100존·협력사룸)</option>
+                            <option value="EVAC_06">[1층] 제조팀 (GSS크린룸·출하장)</option>
+                            <option value="EVAC_07">[3층] 재무팀 (인사·경영·영업 WS)</option>
+                            <option value="EVAC_08">[3층] 기획팀 (연구·제조·생기 WS)</option>
+                            <option value="EVAC_09">[3층] 정보전략팀 (임원실·전산실·회의실)</option>
+                            <option value="EVAC_10">[4층] People/Culture (식당·카페·방재실)</option>
+                        </select>
+
+                        <!-- 담당구역 체크리스트로 즉시 이동하는 버튼 -->
+                        <div id="quickJumpToEvacTab" class="hidden flex items-center justify-between pt-1">
+                            <span class="text-[10px] text-blue-800 font-semibold truncate">
+                                <i class="fa-solid fa-arrow-turn-down text-blue-600 mr-1"></i>해당 구역 수색 대피 체크리스트
+                            </span>
+                            <button onclick="goToEvacZoneDirectly()" class="text-[10.5px] font-bold bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded transition active-ring shrink-0 flex items-center gap-1 shadow-xs">
+                                <span>체크하러 이동</span>
+                                <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Dynamic Render Card -->
                 <div id="myRoleCardDisplay" class="mt-3">
@@ -233,12 +279,12 @@
                         <i class="fa-solid fa-bullhorn mr-1.5 text-amber-600"></i>
                         피난유도반 현장 행동 수칙
                     </h2>
-                    <span class="text-[9.5px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded shadow-xs flex items-center gap-1">
-                        <i class="fa-solid fa-bolt"></i> 체크 즉시 구글시트 자동저장
+                    <span id="queueCountIndicator" class="text-[9.5px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded shadow-xs flex items-center gap-1">
+                        <i class="fa-solid fa-bolt"></i> 체크 즉시 자동 전송
                     </span>
                 </div>
                 <p class="text-[11px] text-amber-900 leading-relaxed">
-                    구역 수색 후 <strong>[대피완료]</strong> 체크 시 상황실 관제 모니터와 구글 시트로 즉시 전송됩니다. 미대피자 또는 이상 발생 시 팝업에 내용을 입력해 주세요.
+                    구역 수색 후 <strong>[대피완료]</strong> 체크 시 상황실 관제 모니터와 구글 시트로 즉시 전송됩니다. 미대피자 또는 이상 발생 시 팝업에 내용을 입력해 주세요. (음영구역에서는 임시 저장 후 자동 복구)
                 </p>
             </div>
 
@@ -291,7 +337,7 @@
 
             <div class="pt-1 flex gap-2">
                 <button onclick="forceManualSync()" class="flex-1 bg-blue-600 text-white font-bold py-2.5 rounded-lg text-xs hover:bg-blue-700 transition flex items-center justify-center shadow-xs active-ring">
-                    <i class="fa-solid fa-rotate mr-1.5"></i> 시트 강제 재전송
+                    <i class="fa-solid fa-rotate mr-1.5"></i> 시트 강제 재전송 / 큐 비우기
                 </button>
                 <button onclick="openResetModal()" class="bg-gray-200 text-gray-700 font-bold px-3.5 py-2.5 rounded-lg text-xs hover:bg-gray-300 transition shrink-0 active-ring">
                     초기화
@@ -322,7 +368,7 @@
                 </div>
             </div>
 
-            <!-- 대시보드 핵심 KPI 카드 (모바일 2x2 정돈) -->
+            <!-- 대시보드 핵심 KPI 카드 -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <div class="bg-white p-2.5 sm:p-3 rounded-xl border border-gray-200 shadow-xs text-center">
                     <span class="text-[11px] text-gray-500 font-medium">대피 진행률</span>
@@ -377,7 +423,6 @@
                     </div>
                 </div>
 
-                <!-- 10개 구역 시각적 카드 매트릭스 (모바일 글자 밀림 방지 패딩/폰트) -->
                 <div id="dashboardGridContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <!-- Dynamic Dashboard Grid Items -->
                 </div>
@@ -409,14 +454,12 @@
                     <i id="contact-acc-icon" class="fa-solid fa-chevron-down text-red-400 text-xs transition-transform duration-200 rotate-180"></i>
                 </button>
                 <div id="contact-acc-content" class="p-3 space-y-3.5 text-xs bg-white">
-                    <!-- 1. 사고 발생 시 보고 절차 및 가동 기준 -->
                     <div class="space-y-2 border-b border-gray-100 pb-3">
                         <h3 class="font-bold text-slate-800 text-xs flex items-center">
                             <span class="w-4 h-4 rounded-full bg-red-600 text-white text-[10px] flex items-center justify-center mr-1.5 font-bold shrink-0">1</span>
                             사고 발생 시 보고 절차 및 가동 기준
                         </h3>
                         
-                        <!-- 보고 절차 모바일 대응 -->
                         <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 space-y-1">
                             <span class="font-bold text-slate-700 block text-[10.5px]">■ 보고 절차</span>
                             <div class="grid grid-cols-4 gap-1 text-center text-[10px] font-semibold text-slate-700">
@@ -427,7 +470,6 @@
                             </div>
                         </div>
 
-                        <!-- 주의 사항 -->
                         <div class="bg-red-50 p-2 rounded-lg border border-red-200 text-red-900 text-[10.5px] flex items-start space-x-1.5">
                             <i class="fa-solid fa-circle-exclamation text-red-600 mt-0.5 shrink-0"></i>
                             <div>
@@ -436,7 +478,6 @@
                             </div>
                         </div>
 
-                        <!-- 가동 기준 -->
                         <div class="bg-amber-50/70 p-2 rounded-lg border border-amber-200 text-[10.5px] space-y-0.5">
                             <span class="font-bold text-amber-900 block">■ 가동 기준 (1개 이상 발생 시 상황실 가동)</span>
                             <ul class="list-disc list-inside text-gray-700 space-y-0.5 text-[10px]">
@@ -448,7 +489,6 @@
                         </div>
                     </div>
 
-                    <!-- 2. 비상 상황실 및 주요 연락처 -->
                     <div class="space-y-1.5 border-b border-gray-100 pb-3">
                         <h3 class="font-bold text-slate-800 text-xs flex items-center">
                             <span class="w-4 h-4 rounded-full bg-slate-800 text-white text-[10px] flex items-center justify-center mr-1.5 font-bold shrink-0">2</span>
@@ -470,7 +510,6 @@
                         </div>
                     </div>
 
-                    <!-- 3. 대외 기관 및 응급병원 (모바일 가로 스크롤 카드 형태) -->
                     <div class="space-y-1.5">
                         <h3 class="font-bold text-slate-800 text-xs flex items-center">
                             <span class="w-4 h-4 rounded-full bg-slate-800 text-white text-[10px] flex items-center justify-center mr-1.5 font-bold shrink-0">3</span>
@@ -727,7 +766,7 @@ function doGet(e) {
                 icon: "fa-flask-vial",
                 color: "text-purple-600",
                 steps: [
-                    "<strong>[15분 내 법적 신고]</strong> 화학물질/독성가스 누출 시 15분 이내 관할 지자체 및 소방서 즉시 신고",
+                    "<strong>[15분 내 법적 신고]</strong> 화학물질/독성가스 누출 시 15분 이내 관할 지자체 및 소방서 즉시 신고 (화관법)",
                     "<strong>[메인 밸브 차단]</strong> 안전 확보 시 방호안전반은 공급 메인 밸브(Emergency Shut-off) 차단",
                     "<strong>[방독면 착용]</strong> 현장 조치 인원은 해당 가스/물질 전용 방독면 및 보호구 필수 착용",
                     "<strong>[상풍원 대피]</strong> 바람이 불어오는 방향(상풍원) 또는 측면 방향으로 대피 (저지대 피할 것)",
@@ -808,7 +847,7 @@ function doGet(e) {
                 category: "화재",
                 group: "방호안전반",
                 dept: "설비기술G",
-                roles: "ㅇ 설비 제어\nㅇ 에너지 차단\nㅇ시설 정보 제공",
+                roles: "ㅇ 설비 제어\nㅇ 에너지 차단\nㅇ 시설 정보 제공",
                 minCount: 2,
                 baseCount: 4,
                 mainTask: "ㅇ [설비 제어] 가스 · 전기 · UT 설비 모니터링 및 제어 지원\nㅇ [에너지 차단] 메인 변전실, 가스밸브 차단 및 2차 피해 방지\nㅇ [시설 정보 제공] 소방대 도착 시 시설 도면 인도 및 유틸리티 브리핑",
@@ -817,13 +856,13 @@ function doGet(e) {
             },
             {
                 category: "화재",
-                group: "피난유도반",
+                group: "피난유도반_GROUP",
                 dept: "각 부서",
-                roles: "ㅇ 피난경로 확보\nㅇ 잔류자 수색\n ㅇ 피난 유도",
+                roles: "ㅇ 피난경로 확보\nㅇ 잔류자 수색\nㅇ 피난 유도",
                 minCount: 10,
                 baseCount: 20,
                 mainTask: "ㅇ [피난경로 확보] 각 담당구역 배치 후 구역 내 피난경로 확보\nㅇ [잔류자 수색] 구역 내 잔류자 수색 및 대피 독려\nㅇ [피난 유도] 인근 피난경로 확보 후 퇴실 보고\nㅇ [피난 유도] 재해약자 확인 시 피난보조자 지원\nㅇ [피난 유도] 구역 내 구조자 발견 시 지휘통제반 보고",
-                keyPoint: "ㅇ 피난유도반장 : 집결지 통제조 (2명)\nㅇ 회의실, 임원실 등 정밀수색\nㅇ 신체 건강, 본사 상주 인력 위주 편성",
+                keyPoint: "ㅇ 피난유도반장 : 집결지 통제조 (2명)\nㅇ 회의실, 임원실, 화장실 등 정밀수색\nㅇ 신체 건강, 본사 상주 인력 위주 편성",
                 equip: "경광봉, 호루라기, 화재 대피마스크, 랜턴"
             }
         ];
@@ -838,18 +877,18 @@ function doGet(e) {
             { id: "EVAC_06", floor: "1층", dept: "제조팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 1층#4 피난유도\nㅇ 잔류자 수색", area: "ㅇ GSS크린룸, TC룸, 제품창고, 출하장 대피 독려 → GATE 4 대피 유도\nㅇ GATE4 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 1층#4 → 집결지", note: "[업무] GSS룸, GSS PA룸, IGS룸, GSS 최종검사, TC룸, 소모품창고, 출하장" },
             { id: "EVAC_07", floor: "3층", dept: "재무팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 3층#1 피난유도\nㅇ 잔류자 수색", area: "ㅇ 인사본부 · 경영지원본부 · 영업팀 WS 대피 독려 → 계단실 #1로 대피유도, 피난\nㅇ 1번 계단실 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 3층#1 → 집결지", note: "[업무] 인사본부 WS, 경영지원본부 WS, 영업팀 WS, CS팀 WS" },
             { id: "EVAC_08", floor: "3층", dept: "기획팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 3층#2 피난유도\nㅇ 잔류자 수색", area: "ㅇ 연구소 · 제조팀 · 생산기술팀 WS 대피 독려 → 계단실 #2로 대피 유도\nㅇ 2번 계단실 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 3층#2 → 집결지", note: "[업무] 연구소 WS, 제조팀 WS, 생산기술팀 WS" },
-            { id: "EVAC_09", floor: "3층", dept: "정보전략팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 3층#3 피난유도\nㅇ 잔류자 수색", area: "ㅇ 임원실 / 회의실 / 부속실 대피 독려\nㅇ 전산실/서버실, 제품TEST실/제어TEST실, 공조실 대피 독려 및 최종 퇴실 보고", route: "업무공간 → 3층 회의실/임원실 등 → 전산실/공조실 등 → 집결지", note: "[회의실] 자유A, 자유B, 자유C, 자유D, 소통A, 소통B, 행복A, 행복B, 대회의실, 중회의실\n[임원실] 대표이사실, COO실\n[인프라] 전산실, 서버실, 공조실, 자재창고\n[부속실] 고객지원 창고, 탕비실, 통화부스, 화장실, 제품TEST실, 제어TEST실" },
+            { id: "EVAC_09", floor: "3층", dept: "정보전략팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 3층#3 피난유도\nㅇ 잔류자 수색", area: "ㅇ 임원실 / 회의실 / 부속실 대피 독려\nㅇ 전산실/서버실, 제품TEST실/제어TEST실, 공조실 대피 독려 및 최종 퇴실 보고", route: "업무공간 → 3층 회의실/임원실 등 → 전산실/공조실 등 → 집결지", note: "[회의실] 자유A~D, 소통A~B, 행복A~B, 대/중회의실\n[임원실] 대표이사실, COO실\n[인프라] 전산실, 서버실, 공조실, 자재창고\n[부속실] 고객지원 창고, 탕비실, 제품TEST실" },
             { id: "EVAC_10", floor: "4층", dept: "People팀 / Culture팀", name: "피난유도1(정) / 피난유도2(부)", task: "ㅇ 4층 피난유도\nㅇ 잔류자 수색", area: "ㅇ 식당, 주방, 원익다움, 카페, 휴게실 대피 독려 → GATE1 or GATE2 대피유도\nㅇ 1번 · 2번 계단실 대피로 확보 및 최종 퇴실 보고", route: "업무공간 → 4층 → 집결지", note: "[복지] 식당, 카페, 직원휴게실\n[회의실] 원익다움\n[업무] 방재실, 문서고" }
         ];
 
-        // 4. 매뉴얼 데이터
+        // 4. 매뉴얼 데이터 (비상방송 우선/일제 경보 문안 보완)
         const MANUAL_DATA = [
             {
                 title: "소화기 사용방법",
                 icon: "fa-fire-extinguisher",
                 steps: [
                     "소화기를 들고 불이 난 곳으로 바람을 등지고 안전거리(2~3m)를 유지하며 이동합니다.",
-                    "손잡이 전면의 안전핀을 힘껏 뽑습니다. (몸통을 들고 핀을 뽑아야 잘 빠집니다)",
+                    "손잡이 전면의 안전핀을 힘껏 뽑습니다. (손잡이를 꽉 쥐지 않은 상태에서 뽑아야 잘 빠집니다)",
                     "호스를 불쪽으로 정확히 향하게 노즐을 잡습니다.",
                     "손잡이를 바짝 쥐고 빗자루로 쓸듯이 아래쪽부터 골고루 분사합니다."
                 ],
@@ -925,15 +964,15 @@ function doGet(e) {
                 videoUrl: "https://www.youtube.com/watch?v=6qK51uAtdnk&t=19s"
             },
             {
-                title: "비상방송장비 사용방법",
+                title: "비상방송장비 사용방법 및 표준 안내멘트",
                 icon: "fa-bullhorn",
                 steps: [
-                    "방송장비의 ECS-6216 컨트롤러에서 ES/PS 단추를 눌러 EM모드로 전환합니다.",
-                    "방송할 ZONE을 선택합니다. (전체 대피 시 ALL 버튼)",
-                    "EP-6216 장비의 비상마이크를 들고 'PTT 버튼'을 누른 채로 육성 방송을 송출합니다.",
-                    "침착하게 화재 사실을 알리는 비상방송 멘트를 송출합니다."
+                    "방송장비 ECS-6216 컨트롤러에서 ES/PS 단추를 눌러 EM모드로 전환합니다.",
+                    "방송 ZONE 선택 : 화재 초기 우선경보(발화층/직상층) 또는 전사원 대피 시 [ALL] 버튼 선택",
+                    "EP-6216 장비의 비상마이크 'PTT 버튼'을 누른 상태에서 명확한 어조로 송출합니다.",
+                    "상황별 표준 멘트를 2회 이상 반복 송출합니다."
                 ],
-                scriptNotice: "※ 멘트 예시 :\n안전환경팀에서 안내 드립니다. 현재 건물 내에 화재경보가 작동 중입니다. 건물 내에 계신 분들께서는 당황하지 마시고 비상구 안내 표시를 따라 안전하게 건물 밖으로 대피해 주시기 바랍니다. 피난유도반원들께서는 즉시 담당 위치에서 대피 유도를 시작해 주시기 바랍니다.",
+                scriptNotice: "■ [표준 멘트 1: 전관 대피 방송]\n안전환경팀 비상상황실에서 안내드립니다. 현재 사내에 화재가 발생하였습니다. 전 임직원 및 방문객께서는 비상구 안내등을 따라 지상 1차 집결지(후문 공터)로 즉시 대피해 주시기 바랍니다. 승강기는 절대 탑승하지 마시고 비상계단을 이용하십시오.\n\n■ [표준 멘트 2: 우선경보/조사 중 안내]\n안전환경팀에서 안내드립니다. 현재 특정 구역 화재경보기가 작동하여 현장 확인 중입니다. 해당 층 근무자께서는 유도요원의 안내에 따라 즉시 대피 준비를 해주시기 바라며, 타 층 근무자께서는 다음 안내 방송에 귀 기울여 주십시오.",
                 videoUrl: "https://www.youtube.com/watch?v=mO-zTqpvg9k",
                 docUrl: "https://hyunjiklee119-collab.github.io/EPM_V2/",
                 docLabel: "상세 비상방송 매뉴얼"
@@ -942,7 +981,7 @@ function doGet(e) {
                 title: "심폐소생술(CPR) 및 AED",
                 icon: "fa-heart-pulse",
                 steps: [
-                    "환자 어깨를 두드리며 반응 및 호흡 상태를 확인하고, 특정인을 지목하여 119 신고 및 AED 가져오기를 요청합니다.",
+                    "환자 어깨를 두드리며 반응 및 호흡 상태를 확인하고, 특정인을 지목하여 119 신고 및 AED 지참을 요청합니다.",
                     "가슴 중앙(양 젖꼭지 연결선 중간)에 손깍지를 끼고 분당 100~120회, 5cm 깊이로 강하고 빠르게 압박합니다.",
                     "AED 도착 즉시 전원을 켜고, 우측 빗장뼈 아래와 좌측 옆구리에 패드를 부착합니다.",
                     "음성지시에 따라 환자 접촉을 떼고 심장충격(제세동) 버튼을 누른 후 즉시 가슴압박을 재개합니다."
@@ -976,33 +1015,45 @@ function doGet(e) {
         /* ==================== STATE MANAGEMENT ==================== */
         let evacChecklistState = {};
         let evacRemarksState = {};
+        let syncQueue = []; // 오프라인 음영구역 대비 큐
         let currentActiveZoneId = null;
         let lastSyncTimestamp = null;
 
         function loadChecklistState() {
             const saved = localStorage.getItem('EVAC_CHECKLIST_STATE');
             if (saved) {
-                try {
-                    evacChecklistState = JSON.parse(saved);
-                } catch(e) {
-                    evacChecklistState = {};
-                }
+                try { evacChecklistState = JSON.parse(saved); } catch(e) { evacChecklistState = {}; }
             }
             const savedRemarks = localStorage.getItem('EVAC_REMARKS_STATE');
             if (savedRemarks) {
-                try {
-                    evacRemarksState = JSON.parse(savedRemarks);
-                } catch(e) {
-                    evacRemarksState = {};
-                }
+                try { evacRemarksState = JSON.parse(savedRemarks); } catch(e) { evacRemarksState = {}; }
             }
+            const savedQueue = localStorage.getItem('EVAC_SYNC_QUEUE');
+            if (savedQueue) {
+                try { syncQueue = JSON.parse(savedQueue); } catch(e) { syncQueue = []; }
+            }
+            updateQueueIndicator();
         }
 
         function saveChecklistState() {
             localStorage.setItem('EVAC_CHECKLIST_STATE', JSON.stringify(evacChecklistState));
             localStorage.setItem('EVAC_REMARKS_STATE', JSON.stringify(evacRemarksState));
+            localStorage.setItem('EVAC_SYNC_QUEUE', JSON.stringify(syncQueue));
             updateEvacProgress();
             renderDashboard();
+            updateQueueIndicator();
+        }
+
+        function updateQueueIndicator() {
+            const ind = document.getElementById('queueCountIndicator');
+            if (!ind) return;
+            if (syncQueue.length > 0) {
+                ind.className = 'text-[9.5px] font-bold bg-amber-600 text-white px-2 py-0.5 rounded shadow-xs flex items-center gap-1 animate-pulse';
+                ind.innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> 대기 큐: ${syncQueue.length}건`;
+            } else {
+                ind.className = 'text-[9.5px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded shadow-xs flex items-center gap-1';
+                ind.innerHTML = `<i class="fa-solid fa-bolt"></i> 체크 즉시 자동 전송`;
+            }
         }
 
         // Tab Switcher
@@ -1028,11 +1079,138 @@ function doGet(e) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function renderMyRoleCard() {
-            const select = document.getElementById('myRoleSelect');
-            const roleName = select ? select.value : "";
+        // 1차 드롭다운 변경 처리
+        function handlePrimaryRoleChange() {
+            const primaryRole = document.getElementById('myRoleSelect').value;
+            const subContainer = document.getElementById('evacSubZoneContainer');
             
-            if (!roleName) {
+            localStorage.setItem('SAVED_PRIMARY_ROLE', primaryRole);
+
+            if (primaryRole === '피난유도반') {
+                if (subContainer) subContainer.classList.remove('hidden');
+            } else {
+                if (subContainer) subContainer.classList.add('hidden');
+            }
+
+            renderMyRoleCard();
+        }
+
+        // 특정 피난구역 체크리스트로 원터치 이동
+        function goToEvacZoneDirectly() {
+            const subSelect = document.getElementById('evacSubZoneSelect');
+            const zoneId = subSelect ? subSelect.value : '';
+            if (!zoneId || zoneId === 'ALL') return;
+            
+            // 필터 자동 설정 후 탭 3으로 이동
+            const filterEl = document.getElementById('evacFilter');
+            if (filterEl) filterEl.value = zoneId;
+            renderEvacTable();
+            switchTab(3);
+        }
+
+        function renderMyRoleCard() {
+            const primarySelect = document.getElementById('myRoleSelect');
+            const primaryRole = primarySelect ? primarySelect.value : "";
+            const subContainer = document.getElementById('evacSubZoneContainer');
+            const jumpBtn = document.getElementById('quickJumpToEvacTab');
+
+            // 1. 피난유도반이 선택된 경우 (2차 드롭다운 평가)
+            if (primaryRole === '피난유도반') {
+                if (subContainer) subContainer.classList.remove('hidden');
+                
+                const subSelect = document.getElementById('evacSubZoneSelect');
+                const subZoneVal = subSelect ? subSelect.value : 'ALL';
+                localStorage.setItem('SAVED_SUB_ZONE', subZoneVal);
+
+                // 2차에서 '총괄'을 선택한 경우
+                if (subZoneVal === 'ALL') {
+                    if (jumpBtn) jumpBtn.classList.add('hidden');
+                    const groupData = ORG_DATA.find(item => item.group === '피난유도반_GROUP');
+                    if (groupData) {
+                        document.getElementById('myRoleCardDisplay').innerHTML = `
+                            <div class="bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-xl p-3.5 sm:p-4 shadow border border-slate-700">
+                                <div class="flex items-center justify-between border-b border-slate-700 pb-2 mb-2.5">
+                                    <div>
+                                        <span class="text-[9px] font-bold bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded mr-1">피난유도반 총괄</span>
+                                        <span class="text-xs text-slate-300">${groupData.dept}</span>
+                                        <h3 class="text-sm sm:text-base font-extrabold text-white mt-0.5">피난유도반 기본 행동수칙</h3>
+                                    </div>
+                                    <div class="text-right shrink-0">
+                                        <span class="text-[9px] text-slate-400 block">편성 인원</span>
+                                        <span class="text-xs sm:text-sm font-bold text-amber-400">10개 구역 / 20명</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-2 text-xs">
+                                    <div class="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700/80">
+                                        <span class="text-slate-400 font-semibold block text-[11px] mb-0.5"><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i>주요 임무:</span>
+                                        <p class="text-slate-100 font-bold whitespace-pre-line leading-relaxed">${groupData.mainTask}</p>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-400 font-semibold block text-[11px] mb-0.5"><i class="fa-solid fa-circle-exclamation text-amber-400 mr-1"></i>수색 수칙:</span>
+                                        <p class="text-slate-300 whitespace-pre-line leading-relaxed">${groupData.keyPoint}</p>
+                                    </div>
+                                    <div class="pt-1.5 border-t border-slate-700/50">
+                                        <span class="text-slate-400 font-semibold inline-block text-[11px]"><i class="fa-solid fa-toolbox text-orange-400 mr-1"></i>휴대 장비:</span>
+                                        <span class="text-slate-200 ml-1 font-medium">${groupData.equip}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+
+                // 2차에서 세부 10개 구역 중 하나를 선택한 경우
+                if (jumpBtn) jumpBtn.classList.remove('hidden');
+                const zone = EVAC_DATA.find(z => z.id === subZoneVal);
+                if (zone) {
+                    const isChecked = !!evacChecklistState[zone.id];
+                    const remark = evacRemarksState[zone.id] || "";
+                    const zoneHtml = `
+                        <div class="bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-xl p-3.5 sm:p-4 shadow border border-slate-700 space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+                                <div>
+                                    <span class="text-[9px] font-bold bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded mr-1">피난유도 구역</span>
+                                    <span class="text-xs text-slate-300">${zone.dept}</span>
+                                    <h3 class="text-sm sm:text-base font-extrabold text-white mt-0.5">[${zone.floor}] 담당 피난유도 임무</h3>
+                                </div>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-black shrink-0 ${isChecked ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white animate-pulse'}">
+                                    ${isChecked ? '수색완료' : '수색대기'}
+                                </span>
+                            </div>
+
+                            <div class="space-y-2 text-xs">
+                                <div class="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700/80">
+                                    <span class="text-amber-400 font-bold block text-[11px] mb-0.5"><i class="fa-solid fa-bullseye mr-1"></i>담당 수색 구역:</span>
+                                    <p class="text-slate-100 font-bold whitespace-pre-line leading-relaxed">${zone.area}</p>
+                                </div>
+                                <div class="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700/80">
+                                    <span class="text-blue-400 font-bold block text-[11px] mb-0.5"><i class="fa-solid fa-route mr-1"></i>피난 동선 및 집결 경로:</span>
+                                    <p class="text-slate-200 font-medium leading-relaxed">${zone.route}</p>
+                                </div>
+                                <div class="bg-slate-800/80 p-2 rounded border border-slate-700/60 text-[10.5px]">
+                                    <span class="text-slate-400 font-bold block mb-0.5"><i class="fa-solid fa-door-open mr-1"></i>확인 대상 공간:</span>
+                                    <p class="text-slate-300 whitespace-pre-line leading-tight">${zone.note}</p>
+                                </div>
+                                ${isChecked && remark ? `
+                                <div class="bg-amber-900/60 border border-amber-500/50 p-2 rounded text-amber-200 text-xs">
+                                    <span class="font-bold block text-[10.5px]">입력된 특이사항:</span>
+                                    <p>${remark}</p>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('myRoleCardDisplay').innerHTML = zoneHtml;
+                    return;
+                }
+            } else {
+                if (subContainer) subContainer.classList.add('hidden');
+                if (jumpBtn) jumpBtn.classList.add('hidden');
+            }
+            
+            // 2. 공통 수칙인 경우
+            if (!primaryRole) {
                 const commonHtml = `
                     <div class="bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-xl p-3.5 sm:p-4 shadow border border-slate-700">
                         <div class="flex items-center justify-between border-b border-slate-700 pb-2 mb-2.5">
@@ -1068,7 +1246,8 @@ function doGet(e) {
                 return;
             }
 
-            const data = ORG_DATA.find(item => item.group === roleName);
+            // 3. 지휘부 / 지휘통제반 / 초동대응반 / 방호안전반인 경우
+            const data = ORG_DATA.find(item => item.group === primaryRole);
             if (!data) return;
 
             const html = `
@@ -1215,7 +1394,6 @@ function doGet(e) {
                 document.getElementById('remarkInput').value = evacRemarksState[id] || "";
                 document.getElementById('remarkModal').classList.remove('hidden');
             } else {
-                // 체크 해제 시 즉시 미완료 반영 & 자동 전송
                 evacChecklistState[id] = false;
                 delete evacRemarksState[id];
                 saveChecklistState();
@@ -1247,7 +1425,7 @@ function doGet(e) {
             closeRemarkModal(false);
             renderEvacTable();
             
-            // 구글 시트로 해당 구역 대피완료 자동 전송
+            // 전송 시도
             syncSingleZoneToGoogleSheets(zoneId, true, currentRemark);
         }
 
@@ -1282,6 +1460,7 @@ function doGet(e) {
         function confirmResetChecklist() {
             evacChecklistState = {};
             evacRemarksState = {};
+            syncQueue = [];
             saveChecklistState();
             closeResetModal();
             renderEvacTable();
@@ -1296,7 +1475,6 @@ function doGet(e) {
             const remarksCount = Object.keys(evacRemarksState).filter(k => evacChecklistState[k] && evacRemarksState[k]).length;
             const percentage = Math.round((completed / total) * 100);
 
-            // KPI 업데이트
             document.getElementById('dashKpiPercent').innerText = `${percentage}%`;
             document.getElementById('dashKpiCompleted').innerHTML = `${completed} <span class="text-xs font-semibold text-gray-400">/ ${total}</span>`;
             document.getElementById('dashKpiRemaining').innerText = remaining;
@@ -1304,7 +1482,6 @@ function doGet(e) {
             document.getElementById('dashProgressLabel').innerText = `${completed} / ${total} 구역 완료 (${percentage}%)`;
             document.getElementById('dashMainProgressBar').style.width = `${percentage}%`;
 
-            // 10개 구역 카드 그리드 렌더링
             const gridContainer = document.getElementById('dashboardGridContainer');
             if (gridContainer) {
                 gridContainer.innerHTML = EVAC_DATA.map(item => {
@@ -1336,14 +1513,13 @@ function doGet(e) {
 
                             <div class="mt-1.5 pt-1.5 border-t border-gray-200/60 text-[10px] text-gray-500 flex justify-between items-center">
                                 <span class="truncate">담당: ${item.name}</span>
-                                <span class="font-bold text-slate-600 shrink-0">${isDone ? '동기화 완료' : '미완료'}</span>
+                                <span class="font-bold text-slate-600 shrink-0">${isDone ? '상태: 안전' : '미완료'}</span>
                             </div>
                         </div>
                     `;
                 }).join('');
             }
 
-            // 실시간 특이사항 피드
             const feedContainer = document.getElementById('dashboardRemarksFeed');
             if (feedContainer) {
                 const remarksList = EVAC_DATA.filter(item => evacChecklistState[item.id] && evacRemarksState[item.id]);
@@ -1367,14 +1543,13 @@ function doGet(e) {
                 }
             }
 
-            // 마지막 갱신 시각 표시
             const timeEl = document.getElementById('dashboardLastUpdate');
             if (timeEl) {
                 timeEl.innerText = lastSyncTimestamp ? `최근 전송: ${lastSyncTimestamp}` : '로컬 상태 실시간 반영';
             }
         }
 
-        // 단일 구역 체크 즉시 구글 시트로 백그라운드 자동 전송
+        // 단일 구역 체크 전송 (오프라인 큐 처리 포함)
         async function syncSingleZoneToGoogleSheets(zoneId, isDone, remark) {
             const scriptUrl = localStorage.getItem('APPS_SCRIPT_URL') || DEFAULT_SCRIPT_URL;
             const target = EVAC_DATA.find(d => d.id === zoneId);
@@ -1382,12 +1557,6 @@ function doGet(e) {
 
             const nowTime = new Date().toLocaleTimeString('ko-KR');
             lastSyncTimestamp = nowTime;
-
-            const miniBadge = document.getElementById('autoSyncMiniIndicator');
-            const mainBadge = document.getElementById('syncStatusBadge');
-            
-            if (miniBadge) miniBadge.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-amber-500 text-[8px]"></i> 전송 중...`;
-            if (mainBadge) mainBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-up text-[8px]"></i> 전송 중`;
 
             const payload = {
                 timestamp: new Date().toLocaleString('ko-KR'),
@@ -1404,6 +1573,22 @@ function doGet(e) {
                 totalCount: EVAC_DATA.length
             };
 
+            // 네트워크 오프라인 상태 감지 시 즉시 큐에 적재
+            if (!navigator.onLine) {
+                syncQueue.push(payload);
+                saveChecklistState();
+                showToast(`[오프라인 저장] 네트워크 복귀 시 자동 전송됩니다.`);
+                const miniBadge = document.getElementById('autoSyncMiniIndicator');
+                if (miniBadge) miniBadge.innerHTML = `<i class="fa-solid fa-clock-rotate-left text-amber-500 text-[8px]"></i> 큐 대기(${syncQueue.length}건)`;
+                return;
+            }
+
+            const miniBadge = document.getElementById('autoSyncMiniIndicator');
+            const mainBadge = document.getElementById('syncStatusBadge');
+            
+            if (miniBadge) miniBadge.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-amber-500 text-[8px]"></i> 전송 중...`;
+            if (mainBadge) mainBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-up text-[8px]"></i> 전송 중`;
+
             try {
                 await fetch(scriptUrl, {
                     method: 'POST',
@@ -1412,19 +1597,20 @@ function doGet(e) {
                     body: JSON.stringify(payload)
                 });
                 
-                showToast(`[${target.floor}] ${target.dept} 대피현황이 자동 전송되었습니다.`);
+                showToast(`[${target.floor}] ${target.dept} 대피현황이 전송되었습니다.`);
                 if (miniBadge) miniBadge.innerHTML = `<i class="fa-solid fa-circle text-[7px] text-emerald-500"></i> 자동 동기화됨 (${nowTime})`;
                 if (mainBadge) mainBadge.innerHTML = `<i class="fa-solid fa-cloud-check text-[8px]"></i> 자동연동`;
                 renderDashboard();
             } catch (err) {
-                console.warn('Google Sheets sync error:', err);
-                if (miniBadge) miniBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-500 text-[8px]"></i> 로컬저장 완료`;
-                if (mainBadge) mainBadge.innerHTML = `<i class="fa-solid fa-cloud text-[8px]"></i> 로컬저장`;
-                showToast(`로컬 저장 완료 (구글 시트 연동 대기)`);
+                console.warn('Google Sheets sync failed, queued for retry:', err);
+                syncQueue.push(payload);
+                saveChecklistState();
+                if (miniBadge) miniBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-500 text-[8px]"></i> 로컬큐 임시저장`;
+                showToast(`로컬 큐에 임시 저장되었습니다.`);
             }
         }
 
-        // 전체 강제 동기화 (버튼 클릭 시)
+        // 전체 동기화 및 큐에 쌓인 데이터 일괄 플러시
         async function forceManualSync() {
             const scriptUrl = localStorage.getItem('APPS_SCRIPT_URL') || DEFAULT_SCRIPT_URL;
 
@@ -1443,7 +1629,7 @@ function doGet(e) {
                 }))
             };
 
-            showToast('전체 대피 현황을 구글 시트로 전송 중...');
+            showToast('전체 대피 현황을 동기화하는 중...');
 
             try {
                 await fetch(scriptUrl, {
@@ -1452,16 +1638,18 @@ function doGet(e) {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+                
+                syncQueue = []; // 성공 시 큐 클리어
+                saveChecklistState();
                 lastSyncTimestamp = new Date().toLocaleTimeString('ko-KR');
                 renderDashboard();
                 showToast('구글 시트 전체 동기화가 완료되었습니다!');
             } catch (err) {
                 console.error(err);
-                showToast('전송 중 오류가 발생했습니다. 네트워크를 확인하세요.', true);
+                showToast('동기화 실패: 네트워크 상태를 확인하세요.', true);
             }
         }
 
-        // 대시보드 새로고침 버튼
         function refreshDashboardData(showIndicator = false) {
             const icon = document.getElementById('dashRefreshIcon');
             if (icon) icon.classList.add('fa-spin');
@@ -1492,7 +1680,7 @@ function doGet(e) {
                         </ol>
 
                         ${item.scriptNotice ? `
-                        <div class="bg-amber-50 border border-amber-200 p-2 rounded-lg text-amber-900 font-medium whitespace-pre-line text-[10.5px] leading-relaxed">
+                        <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-lg text-amber-900 font-medium whitespace-pre-line text-[10.5px] leading-relaxed">
                             ${item.scriptNotice}
                         </div>
                         ` : ''}
@@ -1546,7 +1734,6 @@ function doGet(e) {
             icon.classList.toggle('rotate-180');
         }
 
-        // Settings Modal handlers
         function openSettingsModal() {
             const savedUrl = localStorage.getItem('APPS_SCRIPT_URL') || DEFAULT_SCRIPT_URL;
             document.getElementById('scriptUrlInput').value = savedUrl;
@@ -1571,7 +1758,6 @@ function doGet(e) {
             showToast('Apps Script 코드가 복사되었습니다! 구글 시트에 붙여넣으세요.');
         }
 
-        // Toast utility
         function showToast(msg, isError = false) {
             const toast = document.getElementById('toast');
             const icon = document.getElementById('toastIcon');
@@ -1590,13 +1776,49 @@ function doGet(e) {
             }, 2500);
         }
 
+        /* ==================== NETWORK & EVENT LISTENERS ==================== */
+        window.addEventListener('online', () => {
+            const banner = document.getElementById('offlineNoticeBanner');
+            if (banner) banner.classList.add('hidden');
+            showToast('네트워크가 복원되었습니다. 대기 중인 데이터를 전송합니다.');
+            forceManualSync();
+        });
+
+        window.addEventListener('offline', () => {
+            const banner = document.getElementById('offlineNoticeBanner');
+            if (banner) banner.classList.remove('hidden');
+            showToast('네트워크 연결이 끊어졌습니다. 로컬에 저장됩니다.', true);
+        });
+
         window.onload = function() {
             loadChecklistState();
+
+            // 저장된 사용자 역할 상태 복원
+            const savedPrimary = localStorage.getItem('SAVED_PRIMARY_ROLE');
+            const savedSub = localStorage.getItem('SAVED_SUB_ZONE');
+            if (savedPrimary) {
+                const primaryEl = document.getElementById('myRoleSelect');
+                if (primaryEl) primaryEl.value = savedPrimary;
+                if (savedPrimary === '피난유도반') {
+                    const subContainer = document.getElementById('evacSubZoneContainer');
+                    if (subContainer) subContainer.classList.remove('hidden');
+                    if (savedSub) {
+                        const subEl = document.getElementById('evacSubZoneSelect');
+                        if (subEl) subEl.value = savedSub;
+                    }
+                }
+            }
+
             renderMyRoleCard();
             renderIncidentAccordion();
             renderEvacTable();
             renderDashboard();
             renderManuals();
+
+            if (!navigator.onLine) {
+                const banner = document.getElementById('offlineNoticeBanner');
+                if (banner) banner.classList.remove('hidden');
+            }
         };
     </script>
 </body>
